@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Nuzhat Shahriyar">
 
-<title>Welcome to My Website – STA 9750 Submission Material</title>
+<title>Mini-Project #01: Gourmet Cheeseburgers Across the Globe: Exploring the Most Popular Programming on Netflix – STA 9750 Submission Material</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -70,14 +71,14 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 <link href="site_libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet">
 <script src="site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<link href="site_libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet">
+<script src="site_libs/datatables-binding-0.34.0/datatables.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
-<link href="site_libs/leaflet-1.3.1/leaflet.css" rel="stylesheet">
-<script src="site_libs/leaflet-1.3.1/leaflet.js"></script>
-<link href="site_libs/leafletfix-1.0.0/leafletfix.css" rel="stylesheet">
-<script src="site_libs/proj4-2.6.2/proj4.min.js"></script>
-<script src="site_libs/Proj4Leaflet-1.0.1/proj4leaflet.js"></script>
-<link href="site_libs/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet">
-<script src="site_libs/leaflet-binding-2.2.2/leaflet.js"></script>
+<link href="site_libs/dt-core-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet">
+<link href="site_libs/dt-core-1.13.6/css/jquery.dataTables.extra.css" rel="stylesheet">
+<script src="site_libs/dt-core-1.13.6/js/jquery.dataTables.min.js"></script>
+<link href="site_libs/crosstalk-1.2.1/css/crosstalk.min.css" rel="stylesheet">
+<script src="site_libs/crosstalk-1.2.1/js/crosstalk.min.js"></script>
 
 
 </head>
@@ -110,13 +111,19 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Welcome to My Website</h1>
+<h1 class="title">Mini-Project #01: Gourmet Cheeseburgers Across the Globe: Exploring the Most Popular Programming on Netflix</h1>
 </div>
 
 
 
 <div class="quarto-title-meta">
 
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Nuzhat Shahriyar </p>
+          </div>
+  </div>
     
   
     
@@ -127,19 +134,247 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="hello" class="level1">
-<h1>Hello!</h1>
-<p>My name is Nuzhat Shahriyar.<br>
-I am a student at Baruch College taking STA 9750.</p>
-<p>This website will hold my projects and submissions for the course.</p>
-<hr>
-<p>Last Updated: Sunday 09 07, 2025 at 16:11PM</p>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>Netflix has become a part of everyday life for millions of people around the world, offering everything from hit TV shows to blockbuster films. Some titles capture global attention, while others become local favorites in certain countries. In this project, we take a closer look at Netflix’s Top 10 data to see which shows and movies have stood out the most, how long they stayed popular, and where they made the biggest impact. From worldwide sensations like Stranger Things to hits in India and Brazil, this report explores viewing trends and highlights the stories behind the numbers.</p>
+</section>
+<section id="data-import-and-preperation" class="level2">
+<h2 class="anchored" data-anchor-id="data-import-and-preperation">Data Import and Preperation</h2>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: tidyverse</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.4     ✔ readr     2.1.5
+✔ forcats   1.0.0     ✔ stringr   1.5.1
+✔ ggplot2   3.5.2     ✔ tibble    3.3.0
+✔ lubridate 1.9.4     ✔ tidyr     1.3.1
+✔ purrr     1.1.0     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors
+Rows: 8880 Columns: 9
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: "\t"
+chr  (3): category, show_title, season_title
+dbl  (5): weekly_rank, weekly_hours_viewed, runtime, weekly_views, cumulativ...
+date (1): week
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>spc_tbl_ [8,880 × 9] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
+ $ week                      : Date[1:8880], format: "2025-09-28" "2025-09-28" ...
+ $ category                  : chr [1:8880] "Films (English)" "Films (English)" "Films (English)" "Films (English)" ...
+ $ weekly_rank               : num [1:8880] 1 2 3 4 5 6 7 8 9 10 ...
+ $ show_title                : chr [1:8880] "KPop Demon Hunters" "Ruth &amp; Boaz" "The Wrong Paris" "Man on Fire" ...
+ $ season_title              : chr [1:8880] "N/A" "N/A" "N/A" "N/A" ...
+ $ weekly_hours_viewed       : num [1:8880] 32200000 15900000 13500000 15700000 11200000 8400000 6800000 6200000 4900000 8400000 ...
+ $ runtime                   : num [1:8880] 1.67 1.55 1.78 2.43 1.83 ...
+ $ weekly_views              : num [1:8880] 19300000 10300000 7600000 6500000 6100000 4900000 3600000 3200000 3200000 2800000 ...
+ $ cumulative_weeks_in_top_10: num [1:8880] 15 1 3 5 2 1 1 1 1 3 ...
+ - attr(*, "spec")=
+  .. cols(
+  ..   week = col_date(format = ""),
+  ..   category = col_character(),
+  ..   weekly_rank = col_double(),
+  ..   show_title = col_character(),
+  ..   season_title = col_character(),
+  ..   weekly_hours_viewed = col_double(),
+  ..   runtime = col_double(),
+  ..   weekly_views = col_double(),
+  ..   cumulative_weeks_in_top_10 = col_double()
+  .. )
+ - attr(*, "problems")=&lt;externalptr&gt; </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 8,880
+Columns: 9
+$ week                       &lt;date&gt; 2025-09-28, 2025-09-28, 2025-09-28, 2025-0…
+$ category                   &lt;chr&gt; "Films (English)", "Films (English)", "Film…
+$ weekly_rank                &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1, 2, 3, 4, …
+$ show_title                 &lt;chr&gt; "KPop Demon Hunters", "Ruth &amp; Boaz", "The W…
+$ season_title               &lt;chr&gt; "N/A", "N/A", "N/A", "N/A", "N/A", "N/A", "…
+$ weekly_hours_viewed        &lt;dbl&gt; 32200000, 15900000, 13500000, 15700000, 112…
+$ runtime                    &lt;dbl&gt; 1.6667, 1.5500, 1.7833, 2.4333, 1.8333, 1.7…
+$ weekly_views               &lt;dbl&gt; 19300000, 10300000, 7600000, 6500000, 61000…
+$ cumulative_weeks_in_top_10 &lt;dbl&gt; 15, 1, 3, 5, 2, 1, 1, 1, 1, 3, 2, 1, 1, 2, …</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 8880 Columns: 9
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: "\t"
+chr  (3): category, show_title, season_title
+dbl  (5): weekly_rank, weekly_hours_viewed, runtime, weekly_views, cumulativ...
+date (1): week
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 413620 Columns: 8
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: "\t"
+chr  (5): country_name, country_iso2, category, show_title, season_title
+dbl  (2): weekly_rank, cumulative_weeks_in_top_10
+date (1): week
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+</div>
+</section>
+<section id="initial-data-and-exploration" class="level2">
+<h2 class="anchored" data-anchor-id="initial-data-and-exploration">Initial Data and Exploration</h2>
 <div class="cell">
 <div class="cell-output-display">
-<div class="leaflet html-widget html-fill-item" id="htmlwidget-a786932aa9903129d523" style="width:100%;height:464px;"></div>
-<script type="application/json" data-for="htmlwidget-a786932aa9903129d523">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"https://openstreetmap.org/copyright/\">OpenStreetMap<\/a>,  <a href=\"https://opendatacommons.org/licenses/odbl/\">ODbL<\/a>"}]},{"method":"addPopups","args":[40.75028,-73.98333,"I am a Master's student at <b>Baruch College<\/b>!",null,null,{"maxWidth":300,"minWidth":50,"autoPan":true,"keepInView":false,"closeButton":true,"className":""}]}],"setView":[[40.75028,-73.98333],17,[]],"limits":{"lat":[40.75028,40.75028],"lng":[-73.98333,-73.98333]}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-8bf583e234286b9400d2" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-8bf583e234286b9400d2">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"],["2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28"],["Films (English)","Films (English)","Films (English)","Films (English)","Films (English)","Films (English)","Films (English)","Films (English)","Films (English)","Films (English)","Films (Non-English)","Films (Non-English)","Films (Non-English)","Films (Non-English)","Films (Non-English)","Films (Non-English)","Films (Non-English)","Films (Non-English)","Films (Non-English)","Films (Non-English)"],[1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10],["KPop Demon Hunters","Ruth &amp; Boaz","The Wrong Paris","Man on Fire","Sonic the Hedgehog 3","Seventh Son","San Andreas","28 Years Later","The Curse of La Llorona","aka Charlie Sheen","She Said Maybe","French Lover","Mantis","Mahavatar Narsimha","Son of Sardaar 2","Fall for Me","Saiyaara","A Bright Lawyer","Dhadak 2","Love Untangled"],["N/A","N/A","N/A","N/A","N/A","N/A","N/A","N/A","N/A","aka Charlie Sheen: Season 1","N/A","N/A","N/A","N/A","N/A","N/A","N/A","N/A","N/A","N/A"],[32200000,15900000,13500000,15700000,11200000,8400000,6800000,6200000,4900000,8400000,15800000,16400000,13200000,6600000,4700000,2800000,3700000,2200000,3200000,2700000],[1.6667,1.55,1.7833,2.4333,1.8333,1.7,1.9,1.9167,1.55,3.0333,1.7833,2.0333,1.8833,2.1833,2.4167,1.75,2.5,1.6167,2.3833,2.0167],[19300000,10300000,7600000,6500000,6100000,4900000,3600000,3200000,3200000,2800000,8900000,8100000,7000000,3000000,1900000,1600000,1500000,1400000,1300000,1300000],[15,1,3,5,2,1,1,1,1,3,2,1,1,2,1,6,3,2,1,5]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>week<\/th>\n      <th>category<\/th>\n      <th>weekly_rank<\/th>\n      <th>show_title<\/th>\n      <th>season_title<\/th>\n      <th>weekly_hours_viewed<\/th>\n      <th>runtime<\/th>\n      <th>weekly_views<\/th>\n      <th>cumulative_weeks_in_top_10<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"searching":false,"info":false,"columnDefs":[{"className":"dt-right","targets":[3,6,7,8,9]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"week","targets":1},{"name":"category","targets":2},{"name":"weekly_rank","targets":3},{"name":"show_title","targets":4},{"name":"season_title","targets":5},{"name":"weekly_hours_viewed","targets":6},{"name":"runtime","targets":7},{"name":"weekly_views","targets":8},{"name":"cumulative_weeks_in_top_10","targets":9}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-665c3ab1aaadd27745db" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-665c3ab1aaadd27745db">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"],["2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28"],["Films (English)","Films (English)","Films (English)","Films (English)","Films (English)","Films (English)","Films (English)","Films (English)","Films (English)","Films (English)","Films (Non-English)","Films (Non-English)","Films (Non-English)","Films (Non-English)","Films (Non-English)","Films (Non-English)","Films (Non-English)","Films (Non-English)","Films (Non-English)","Films (Non-English)"],[1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10],["KPop Demon Hunters","Ruth &amp; Boaz","The Wrong Paris","Man on Fire","Sonic the Hedgehog 3","Seventh Son","San Andreas","28 Years Later","The Curse of La Llorona","aka Charlie Sheen","She Said Maybe","French Lover","Mantis","Mahavatar Narsimha","Son of Sardaar 2","Fall for Me","Saiyaara","A Bright Lawyer","Dhadak 2","Love Untangled"],["N/A","N/A","N/A","N/A","N/A","N/A","N/A","N/A","N/A","aka Charlie Sheen: Season 1","N/A","N/A","N/A","N/A","N/A","N/A","N/A","N/A","N/A","N/A"],[32200000,15900000,13500000,15700000,11200000,8400000,6800000,6200000,4900000,8400000,15800000,16400000,13200000,6600000,4700000,2800000,3700000,2200000,3200000,2700000],[1.6667,1.55,1.7833,2.4333,1.8333,1.7,1.9,1.9167,1.55,3.0333,1.7833,2.0333,1.8833,2.1833,2.4167,1.75,2.5,1.6167,2.3833,2.0167],[19300000,10300000,7600000,6500000,6100000,4900000,3600000,3200000,3200000,2800000,8900000,8100000,7000000,3000000,1900000,1600000,1500000,1400000,1300000,1300000],[15,1,3,5,2,1,1,1,1,3,2,1,1,2,1,6,3,2,1,5]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Week<\/th>\n      <th>Category<\/th>\n      <th>Weekly Rank<\/th>\n      <th>Show Title<\/th>\n      <th>Season Title<\/th>\n      <th>Weekly Hours Viewed<\/th>\n      <th>Runtime<\/th>\n      <th>Weekly Views<\/th>\n      <th>Cumulative Weeks In Top 10<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"searching":false,"info":false,"columnDefs":[{"targets":6,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatRound(data, 2, 3, \",\", \".\", null);\n  }"},{"targets":8,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatRound(data, 2, 3, \",\", \".\", null);\n  }"},{"className":"dt-right","targets":[3,6,7,8,9]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"Week","targets":1},{"name":"Category","targets":2},{"name":"Weekly Rank","targets":3},{"name":"Show Title","targets":4},{"name":"Season Title","targets":5},{"name":"Weekly Hours Viewed","targets":6},{"name":"Runtime","targets":7},{"name":"Weekly Views","targets":8},{"name":"Cumulative Weeks In Top 10","targets":9}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":["options.columnDefs.0.render","options.columnDefs.1.render"],"jsHooks":[]}</script>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-81d8a3dc3cb7a4a4c9ce" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-81d8a3dc3cb7a4a4c9ce">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"],["2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28"],["Films (English)","Films (English)","Films (English)","Films (English)","Films (English)","Films (English)","Films (English)","Films (English)","Films (English)","Films (English)","Films (Non-English)","Films (Non-English)","Films (Non-English)","Films (Non-English)","Films (Non-English)","Films (Non-English)","Films (Non-English)","Films (Non-English)","Films (Non-English)","Films (Non-English)"],[1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10],["KPop Demon Hunters","Ruth &amp; Boaz","The Wrong Paris","Man on Fire","Sonic the Hedgehog 3","Seventh Son","San Andreas","28 Years Later","The Curse of La Llorona","aka Charlie Sheen","She Said Maybe","French Lover","Mantis","Mahavatar Narsimha","Son of Sardaar 2","Fall for Me","Saiyaara","A Bright Lawyer","Dhadak 2","Love Untangled"],[32200000,15900000,13500000,15700000,11200000,8400000,6800000,6200000,4900000,8400000,15800000,16400000,13200000,6600000,4700000,2800000,3700000,2200000,3200000,2700000],[1.6667,1.55,1.7833,2.4333,1.8333,1.7,1.9,1.9167,1.55,3.0333,1.7833,2.0333,1.8833,2.1833,2.4167,1.75,2.5,1.6167,2.3833,2.0167],[19300000,10300000,7600000,6500000,6100000,4900000,3600000,3200000,3200000,2800000,8900000,8100000,7000000,3000000,1900000,1600000,1500000,1400000,1300000,1300000],[15,1,3,5,2,1,1,1,1,3,2,1,1,2,1,6,3,2,1,5]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Week<\/th>\n      <th>Category<\/th>\n      <th>Weekly Rank<\/th>\n      <th>Show Title<\/th>\n      <th>Weekly Hours Viewed<\/th>\n      <th>Runtime<\/th>\n      <th>Weekly Views<\/th>\n      <th>Cumulative Weeks In Top 10<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"searching":false,"info":false,"columnDefs":[{"targets":5,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatRound(data, 2, 3, \",\", \".\", null);\n  }"},{"targets":7,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatRound(data, 2, 3, \",\", \".\", null);\n  }"},{"className":"dt-right","targets":[3,5,6,7,8]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"Week","targets":1},{"name":"Category","targets":2},{"name":"Weekly Rank","targets":3},{"name":"Show Title","targets":4},{"name":"Weekly Hours Viewed","targets":5},{"name":"Runtime","targets":6},{"name":"Weekly Views","targets":7},{"name":"Cumulative Weeks In Top 10","targets":8}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":["options.columnDefs.0.render","options.columnDefs.1.render"],"jsHooks":[]}</script>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-d12b6d4d8b21efe5b479" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-d12b6d4d8b21efe5b479">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"],["2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28"],["Films (English)","Films (English)","Films (English)","Films (English)","Films (English)","Films (English)","Films (English)","Films (English)","Films (English)","Films (English)","Films (Non-English)","Films (Non-English)","Films (Non-English)","Films (Non-English)","Films (Non-English)","Films (Non-English)","Films (Non-English)","Films (Non-English)","Films (Non-English)","Films (Non-English)"],[1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10],["KPop Demon Hunters","Ruth &amp; Boaz","The Wrong Paris","Man on Fire","Sonic the Hedgehog 3","Seventh Son","San Andreas","28 Years Later","The Curse of La Llorona","aka Charlie Sheen","She Said Maybe","French Lover","Mantis","Mahavatar Narsimha","Son of Sardaar 2","Fall for Me","Saiyaara","A Bright Lawyer","Dhadak 2","Love Untangled"],[32200000,15900000,13500000,15700000,11200000,8400000,6800000,6200000,4900000,8400000,15800000,16400000,13200000,6600000,4700000,2800000,3700000,2200000,3200000,2700000],[19300000,10300000,7600000,6500000,6100000,4900000,3600000,3200000,3200000,2800000,8900000,8100000,7000000,3000000,1900000,1600000,1500000,1400000,1300000,1300000],[15,1,3,5,2,1,1,1,1,3,2,1,1,2,1,6,3,2,1,5],[100,93,107,146,110,102,114,115,93,182,107,122,113,131,145,105,150,97,143,121]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Week<\/th>\n      <th>Category<\/th>\n      <th>Weekly Rank<\/th>\n      <th>Show Title<\/th>\n      <th>Weekly Hours Viewed<\/th>\n      <th>Weekly Views<\/th>\n      <th>Cumulative Weeks In Top 10<\/th>\n      <th>Runtime (Minutes)<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"searching":false,"info":false,"columnDefs":[{"targets":5,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatRound(data, 2, 3, \",\", \".\", null);\n  }"},{"targets":6,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatRound(data, 2, 3, \",\", \".\", null);\n  }"},{"className":"dt-right","targets":[3,5,6,7,8]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"Week","targets":1},{"name":"Category","targets":2},{"name":"Weekly Rank","targets":3},{"name":"Show Title","targets":4},{"name":"Weekly Hours Viewed","targets":5},{"name":"Weekly Views","targets":6},{"name":"Cumulative Weeks In Top 10","targets":7},{"name":"Runtime (Minutes)","targets":8}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":["options.columnDefs.0.render","options.columnDefs.1.render"],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+<section id="explanatory-questions" class="level2">
+<h2 class="anchored" data-anchor-id="explanatory-questions">Explanatory Questions</h2>
+<p><strong>Question 1: How many different countries does Netflix operate in?</strong></p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 94</code></pre>
+</div>
+</div>
+<p><strong>Question 2: Which non-English-language film has spent the most cumulative weeks in the global top 10? How many weeks did it spend?</strong></p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-433838eb801a50a74c0f" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-433838eb801a50a74c0f">{"x":{"filter":"none","vertical":false,"data":[["1"],["All Quiet on the Western Front"],[23]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>show_title<\/th>\n      <th>total_weeks<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"searching":false,"info":false,"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"show_title","targets":1},{"name":"total_weeks","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<p><strong>Question 3: What is the longest film (English or non-English) to have ever appeared in the Netflix global Top 10? How long is it in minutes?</strong></p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-4301ada8be197efae57b" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-4301ada8be197efae57b">{"x":{"filter":"none","vertical":false,"data":[["1"],["Pushpa 2: The Rule (Reloaded Version)"],[3.7333]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>show_title<\/th>\n      <th>max_runtime<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"searching":false,"info":false,"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"show_title","targets":1},{"name":"max_runtime","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<p><strong>Question 4: For each of the four categories, what program has the most total hours of global viewership?</strong></p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-819b0fc0d36b53c34c19" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-819b0fc0d36b53c34c19">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4"],["Films (English)","Films (Non-English)","TV (English)","TV (Non-English)"],["KPop Demon Hunters","Society of the Snow","Wednesday","Squid Game"],["N/A","N/A","Wednesday: Season 1","Squid Game: Season 1"],[591300000,235900000,2043650000,2729400000]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>category<\/th>\n      <th>show_title<\/th>\n      <th>season_title<\/th>\n      <th>total_hours<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"searching":false,"info":false,"columnDefs":[{"className":"dt-right","targets":4},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"category","targets":1},{"name":"show_title","targets":2},{"name":"season_title","targets":3},{"name":"total_hours","targets":4}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<p><strong>Question 5: Which TV show had the longest run in a country’s Top 10? How long was this run and in what country did it occur?</strong></p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-990420c5c4fde8d62225" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-990420c5c4fde8d62225">{"x":{"filter":"none","vertical":false,"data":[["1"],["Pakistan"],["Money Heist"],["Money Heist: Part 1"],[127]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>country_name<\/th>\n      <th>show_title<\/th>\n      <th>season_title<\/th>\n      <th>longest_run<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"searching":false,"info":false,"columnDefs":[{"className":"dt-right","targets":4},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"country_name","targets":1},{"name":"show_title","targets":2},{"name":"season_title","targets":3},{"name":"longest_run","targets":4}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<p><strong>Question 6: Netflix provides over 200 weeks of service history for all but one country in our data set. Which country is this and when did Netflix cease operations in that country?</strong></p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-46c0ef874881b6047acd" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-46c0ef874881b6047acd">{"x":{"filter":"none","vertical":false,"data":[["1"],["Russia"],[35],["2022-02-27"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>country_name<\/th>\n      <th>total_weeks<\/th>\n      <th>last_week<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"searching":false,"info":false,"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"country_name","targets":1},{"name":"total_weeks","targets":2},{"name":"last_week","targets":3}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<p><strong>Question 7: What is the total viewership of the TV show Squid Game? Note that there are three seasons total and we are looking for the total number of hours watched across all seasons.</strong></p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 5.31e+09</code></pre>
+</div>
+</div>
+<p><strong>Question 8: The movie Red Notice has a runtime of 1 hour and 58 minutes. Approximately how many views did it receive in 2021?</strong></p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-897fab967f13dbd33854" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-897fab967f13dbd33854">{"x":{"filter":"none","vertical":false,"data":[["1"],[396740000],[201732203.3898305]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>total_hours<\/th>\n      <th>approx_views<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"searching":false,"info":false,"columnDefs":[{"className":"dt-right","targets":[1,2]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"total_hours","targets":1},{"name":"approx_views","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<p><strong>Question 9: How many Films reached Number 1 in the US but did not originally debut there?</strong></p>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>No US films reached #1 without debuting at #1.</code></pre>
+</div>
+</div>
+<p><strong>Question 10: Which TV show/season hit the top 10 in the most countries in its debut week? In how many countries did it chart?</strong></p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-cf8f4c5230d0b02fdce4" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-cf8f4c5230d0b02fdce4">{"x":{"filter":"none","vertical":false,"data":[["1"],["Emily in Paris"],["Emily in Paris: Season 2"],[94]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>show_title<\/th>\n      <th>season_title<\/th>\n      <th>num_countries<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"searching":false,"info":false,"columnDefs":[{"className":"dt-right","targets":3},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"show_title","targets":1},{"name":"season_title","targets":2},{"name":"num_countries","targets":3}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+<section id="press-releases" class="level2">
+<h2 class="anchored" data-anchor-id="press-releases">Press Releases</h2>
+<section id="stranger-things-season-5-the-finale-youve-been-waiting-for" class="level3">
+<h3 class="anchored" data-anchor-id="stranger-things-season-5-the-finale-youve-been-waiting-for"><strong>Stranger Things Season 5: The Finale You’ve Been Waiting For</strong></h3>
+<p>Netflix’s global phenomenon <em>Stranger Things</em> returns with its highly anticipated fifth and final season at the end of 2025. Across its first four seasons, <em>Stranger Things</em> has captivated audiences worldwide, amassing a total of <strong>2.96798^{9} hours of global viewership</strong> and consistently ranking in the top 10 for <strong>19 weeks</strong>. Its reach spans <strong>over 93 countries</strong>, highlighting the show’s truly multinational appeal. Compared to other English-language TV hits, <em>Stranger Things</em> has not only dominated weekly charts but also set new benchmarks for binge-worthy storytelling, solidifying its place as one of Netflix’s most successful and enduring series.</p>
+<p>The show takes viewers to the small town of Hawkins, Indiana, where strange and supernatural events unfold alongside the everyday lives of its residents. Fans have followed characters like Eleven, Mike, Dustin, Lucas, Will, and Max as they’ve grown up, faced incredible challenges, and formed friendships that feel real and relatable. Stranger Things has always mixed suspense, humor, and heartfelt moments, all wrapped in a nostalgic 1980s vibe that makes it easy for both longtime fans and new viewers to get hooked.</p>
+<p>As the final season approaches, viewers can expect higher stakes, heartfelt moments, and the same thrilling mix of adventure and suspense that has kept fans hooked all these years. This last chapter of Hawkins’ story is the conclusion of a series that has captured audiences around the world and become a defining part of streaming entertainment.</p>
+</section>
+<section id="netflix-captures-indias-hearts-with-hindi-hits" class="level3">
+<h3 class="anchored" data-anchor-id="netflix-captures-indias-hearts-with-hindi-hits"><strong>Netflix Captures India’s Hearts with Hindi Hits</strong></h3>
+<p>Netflix continues to make waves in India, the world’s most populous country, with a surge in viewership for Hindi-language films and TV shows. Recent hits have collectively racked up <strong>1.83^{8} hours of viewership</strong> and maintained strong positions on the Top 10 charts for <strong>18 weeks</strong>.</p>
+<p>Titles such as <em>RRR (Hindi)</em> and <em>RRR (Hindi)</em> have dominated the charts locally while remaining under the radar in the US, highlighting the unique tastes and opportunities in this market. These viewing numbers suggest a rapidly growing subscriber base in India, currently estimated at approximately <strong>18.3 million</strong>.</p>
+<p>Netflix’s continued investment in regional content reflects the platform’s long-term growth potential in India and positions it as a premier destination for Hindi-language entertainment.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mp01_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="netflix-expands-its-reach-in-brazil" class="level3">
+<h3 class="anchored" data-anchor-id="netflix-expands-its-reach-in-brazil"><strong>Netflix Expands Its Reach in Brazil</strong></h3>
+<p>Netflix continues to be a major player in Brazil’s entertainment scene, offering a wide variety of top-performing films that appeal to different audiences. This week, Sonic the Hedgehog 3 leads the charts, followed by Ruth &amp; Boaz and She Said Maybe. KPop Demon Hunters has also maintained a strong presence, spending 15 cumulative weeks in the top 10, showing that international content can capture local audiences. Other favorites like Man on Fire and The Wrong Paris demonstrate Netflix’s ability to attract viewers across genres, from action and drama to romance and thrillers.</p>
+<p>The diversity of these hits highlights not only the platform’s global reach but also its ability to understand and respond to regional tastes. Brazilian audiences have clearly embraced both local favorites and international sensations, making Netflix a central part of entertainment in the country. With such a strong lineup and continued investment in content that resonates locally, Netflix is well-positioned to grow its presence and influence across South America in the years to come.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-40bec19f73ab0acbe4dc" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-40bec19f73ab0acbe4dc">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"],["Brazil","Brazil","Brazil","Brazil","Brazil","Brazil","Brazil","Brazil","Brazil","Brazil","Brazil","Brazil","Brazil","Brazil","Brazil","Brazil","Brazil","Brazil","Brazil","Brazil"],["BR","BR","BR","BR","BR","BR","BR","BR","BR","BR","BR","BR","BR","BR","BR","BR","BR","BR","BR","BR"],["2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28","2025-09-28"],["Films","Films","Films","Films","Films","Films","Films","Films","Films","Films","TV","TV","TV","TV","TV","TV","TV","TV","TV","TV"],[1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10],["Sonic the Hedgehog 3","Ruth &amp; Boaz","She Said Maybe","French Lover","KPop Demon Hunters","Man on Fire","Mad Max: Fury Road","A Bright Lawyer","The Wrong Paris","Seventh Son","Billionaires' Bunker","Love Is Blind: Brazil","Alice in Borderland","Bon Appétit, Your Majesty","Wayward","The Guest","Wednesday","Lottie Dottie Chicken","Beauty in Black","House of Guinness"],[null,null,null,null,null,null,null,null,null,null,"Billionaires' Bunker: Season 1","Love Is Blind: Brazil: Season 5","Alice in Borderland: Season 3","Bon Appétit, Your Majesty: Limited Series","Wayward: Limited Series","The Guest: Season 1","Wednesday: Season 2","Lottie Dottie Chicken: 2ª temporada","Beauty in Black: Season 2","House of Guinness: Season 1"],[2,1,2,1,15,5,1,2,3,2,2,3,1,6,1,1,8,115,3,1]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>country_name<\/th>\n      <th>country_iso2<\/th>\n      <th>week<\/th>\n      <th>category<\/th>\n      <th>weekly_rank<\/th>\n      <th>show_title<\/th>\n      <th>season_title<\/th>\n      <th>cumulative_weeks_in_top_10<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"searching":false,"info":false,"columnDefs":[{"className":"dt-right","targets":[5,8]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"country_name","targets":1},{"name":"country_iso2","targets":2},{"name":"week","targets":3},{"name":"category","targets":4},{"name":"weekly_rank","targets":5},{"name":"show_title","targets":6},{"name":"season_title","targets":7},{"name":"cumulative_weeks_in_top_10","targets":8}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mp01_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>Overall, Netflix’s Top 10 data gives a deeper insight at how the platform reaches audiences around the world. From global hits like Stranger Things to regional favorites in India and Brazil, it’s clear that different shows and movies connect with people in different ways. Looking at viewership numbers, runtimes, and weeks on the charts helps us understand what keeps audiences coming back for more. These patterns show not just Netflix’s strength as a streaming service, but also how storytelling, culture, and local tastes come together to shape the way people watch and enjoy content worldwide.</p>
 
 
 </section>

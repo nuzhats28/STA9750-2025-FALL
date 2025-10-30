@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.24">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Nuzhat Shahriyar">
+
+<title>Mini-Project #02: Making Backyards Affordable for All</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="mp02_files/libs/clipboard/clipboard.min.js"></script>
+<script src="mp02_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="mp02_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="mp02_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="mp02_files/libs/quarto-html/popper.min.js"></script>
+<script src="mp02_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="mp02_files/libs/quarto-html/anchor.min.js"></script>
+<link href="mp02_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="mp02_files/libs/quarto-html/quarto-syntax-highlighting-dc55a5b9e770e841cd82e46aadbfb9b0.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="mp02_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="mp02_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="mp02_files/libs/bootstrap/bootstrap-d6a003b94517c951b2d65075d42fb01b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="mp02_files/libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet">
+<script src="mp02_files/libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="mp02_files/libs/viz-1.8.2/viz.js"></script>
+<link href="mp02_files/libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet">
+<script src="mp02_files/libs/grViz-binding-1.0.11/grViz.js"></script>
+<script src="mp02_files/libs/core-js-2.5.3/shim.min.js"></script>
+<script src="mp02_files/libs/react-18.2.0/react.min.js"></script>
+<script src="mp02_files/libs/react-18.2.0/react-dom.min.js"></script>
+<script src="mp02_files/libs/reactwidget-2.0.0/react-tools.js"></script>
+<link href="mp02_files/libs/reactable-0.4.4/reactable.css" rel="stylesheet">
+<script src="mp02_files/libs/reactable-binding-0.4.4/reactable.js"></script>
+<link href="mp02_files/libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet">
+<script src="mp02_files/libs/datatables-binding-0.34.0/datatables.js"></script>
+<script src="mp02_files/libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<link href="mp02_files/libs/dt-core-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet">
+<link href="mp02_files/libs/dt-core-1.13.6/css/jquery.dataTables.extra.css" rel="stylesheet">
+<script src="mp02_files/libs/dt-core-1.13.6/js/jquery.dataTables.min.js"></script>
+<link href="mp02_files/libs/crosstalk-1.2.1/css/crosstalk.min.css" rel="stylesheet">
+<script src="mp02_files/libs/crosstalk-1.2.1/js/crosstalk.min.js"></script>
+
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Mini-Project #02: Making Backyards Affordable for All</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Nuzhat Shahriyar </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>Finding affordable housing in U.S. cities can feel like a moving target—some metro areas seem to keep up with demand, while others struggle to provide enough homes for their residents. In this analysis, we dive into the numbers to understand why. We combine several datasets: PERMITS, which tracks new housing units authorized each year; HOUSEHOLDS, which tells us about average household sizes; and RENT, which records monthly rent levels. By connecting these datasets through geographic identifiers, we can see how housing supply, affordability, and demographics interact over time.</p>
+<p>We start with simple but telling questions: Which cities are building the most new housing? Where are households growing or shrinking? Which areas have the highest incomes, and how do local industries like finance, tech, and healthcare shape employment trends? From there, we dig deeper, creating indices of housing affordability (how much of a household’s income goes to rent) and housing growth (new units relative to population growth). These measures highlight metros that are successfully expanding housing versus those struggling to keep up. By looking at trends over time, we can better understand which cities are making housing more accessible and which ones might need extra support—offering a clear picture of how policy, economics, and demographics intersect in shaping our urban landscape.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="grViz html-widget html-fill-item" id="htmlwidget-72db72679462d977852d" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-72db72679462d977852d">{"x":{"diagram":"\ndigraph G {\n  graph [\n    rankdir=LR, \n    fontsize=12, \n    nodesep=0.3,       # space between nodes horizontally\n    ranksep=0.5        # space between ranks vertically\n  ]\n  \n  node [\n    shape=record, \n    style=filled, \n    fillcolor=LightBlue, \n    fontname=Helvetica, \n    width=1.5, \n    height=0.8\n  ]\n\n  # Nodes\n  PERMITS [label=\"{PERMITS | CBSA | year | new_housing_units_permitted}\"]\n  HOUSEHOLDS [label=\"{HOUSEHOLDS | GEOID | year | B11001_001 (avg_household_size)}\"]\n  RENT [label=\"{RENT | GEOID | year | monthly_rent}\"]\n\n  # Edges\n  PERMITS -> HOUSEHOLDS [label=\"CBSA -> GEOID\", fontsize=10]\n  HOUSEHOLDS -> RENT [label=\"GEOID\", fontsize=10]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+<section id="data-integration-and-initial-exploration" class="level2">
+<h2 class="anchored" data-anchor-id="data-integration-and-initial-exploration">Data Integration and Initial Exploration</h2>
+<p><strong>Question 1:Which CBSA permitted the largest number of new housing units in the decade from 2010 to 2019 (inclusive)? </strong></p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>   CBSA total_permits                                      NAME
+1 26420        482075 Houston-Sugar Land-Baytown, TX Metro Area</code></pre>
+</div>
+</div>
+<p><strong>Question 2: In what year did Albuquerque, NM (CBSA 10740) permit the most new housing units? </strong></p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>   CBSA new_housing_units_permitted year
+1 10740                        4021 2021</code></pre>
+</div>
+</div>
+<p><strong>Question 3: Which state had the highest average individual income in 2015? </strong></p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>  state total_income total_population avg_income
+1    DC 202663489140          6098283   33232.88</code></pre>
+</div>
+</div>
+<p><strong>Question 4: What is the last year in which the NYC CBSA had the most data scientists (NAICS 5182)? </strong></p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="reactable html-widget html-fill-item" id="htmlwidget-956e446c0a38fef4038f" style="width:auto;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-956e446c0a38fef4038f">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"GEOID":[35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620],"NAME":["New York-Northern New Jersey-Long Island, NY-NJ-PA Metro Area","New York-Northern New Jersey-Long Island, NY-NJ-PA Metro Area","New York-Northern New Jersey-Long Island, NY-NJ-PA Metro Area","New York-Northern New Jersey-Long Island, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ Metro Area","New York-Northern New Jersey-Long Island, NY-NJ-PA Metro Area","New York-Northern New Jersey-Long Island, NY-NJ-PA Metro Area","New York-Northern New Jersey-Long Island, NY-NJ-PA Metro Area","New York-Northern New Jersey-Long Island, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ Metro Area","New York-Northern New Jersey-Long Island, NY-NJ-PA Metro Area","New York-Northern New Jersey-Long Island, NY-NJ-PA Metro Area","New York-Northern New Jersey-Long Island, NY-NJ-PA Metro Area","New York-Northern New Jersey-Long Island, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ Metro Area","New York-Northern New Jersey-Long Island, NY-NJ-PA Metro Area","New York-Northern New Jersey-Long Island, NY-NJ-PA Metro Area","New York-Northern New Jersey-Long Island, NY-NJ-PA Metro Area","New York-Northern New Jersey-Long Island, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ Metro Area","New York-Northern New Jersey-Long Island, NY-NJ-PA Metro Area","New York-Northern New Jersey-Long Island, NY-NJ-PA Metro Area","New York-Northern New Jersey-Long Island, NY-NJ-PA Metro Area","New York-Northern New Jersey-Long Island, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ Metro Area"],"B01003_001":[19069796,18919983,19015900,19160024,19949502,20092883,20182305,20153634,20320876,19979477,19216182,19768458,19617869,19498249,19069796,18919983,19015900,19160024,19949502,20092883,20182305,20153634,20320876,19979477,19216182,19768458,19617869,19498249,19069796,18919983,19015900,19160024,19949502,20092883,20182305,20153634,20320876,19979477,19216182,19768458,19617869,19498249,19069796,18919983,19015900,19160024,19949502,20092883,20182305,20153634,20320876,19979477,19216182,19768458,19617869,19498249,19069796,18919983,19015900,19160024,19949502,20092883,20182305,20153634,20320876,19979477,19216182,19768458,19617869,19498249],"year":[2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2021,2022,2023,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2021,2022,2023,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2021,2022,2023,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2021,2022,2023,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2021,2022,2023],"std_cbsa":["C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620","C35620"],"YEAR":[2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2009,2012,2012,2012,2012,2012,2012,2012,2012,2012,2012,2012,2012,2012,2012,2013,2013,2013,2013,2013,2013,2013,2013,2013,2013,2013,2013,2013,2013,2014,2014,2014,2014,2014,2014,2014,2014,2014,2014,2014,2014,2014,2014,2015,2015,2015,2015,2015,2015,2015,2015,2015,2015,2015,2015,2015,2015],"FIPS":["C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562","C3562"],"INDUSTRY":[5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182,5182],"EMPLOYMENT":[16349,16349,16349,16349,16349,16349,16349,16349,16349,16349,16349,16349,16349,16349,14423,14423,14423,14423,14423,14423,14423,14423,14423,14423,14423,14423,14423,14423,14251,14251,14251,14251,14251,14251,14251,14251,14251,14251,14251,14251,14251,14251,17828,17828,17828,17828,17828,17828,17828,17828,17828,17828,17828,17828,17828,17828,18922,18922,18922,18922,18922,18922,18922,18922,18922,18922,18922,18922,18922,18922],"TOTAL_WAGES":[1626754391,1626754391,1626754391,1626754391,1626754391,1626754391,1626754391,1626754391,1626754391,1626754391,1626754391,1626754391,1626754391,1626754391,1625393597,1625393597,1625393597,1625393597,1625393597,1625393597,1625393597,1625393597,1625393597,1625393597,1625393597,1625393597,1625393597,1625393597,1619739693,1619739693,1619739693,1619739693,1619739693,1619739693,1619739693,1619739693,1619739693,1619739693,1619739693,1619739693,1619739693,1619739693,2201498626,2201498626,2201498626,2201498626,2201498626,2201498626,2201498626,2201498626,2201498626,2201498626,2201498626,2201498626,2201498626,2201498626,2751424594,2751424594,2751424594,2751424594,2751424594,2751424594,2751424594,2751424594,2751424594,2751424594,2751424594,2751424594,2751424594,2751424594],"AVG_WAGE":[99501.7671417212,99501.7671417212,99501.7671417212,99501.7671417212,99501.7671417212,99501.7671417212,99501.7671417212,99501.7671417212,99501.7671417212,99501.7671417212,99501.7671417212,99501.7671417212,99501.7671417212,99501.7671417212,112694.557096305,112694.557096305,112694.557096305,112694.557096305,112694.557096305,112694.557096305,112694.557096305,112694.557096305,112694.557096305,112694.557096305,112694.557096305,112694.557096305,112694.557096305,112694.557096305,113657.967370711,113657.967370711,113657.967370711,113657.967370711,113657.967370711,113657.967370711,113657.967370711,113657.967370711,113657.967370711,113657.967370711,113657.967370711,113657.967370711,113657.967370711,113657.967370711,123485.451312542,123485.451312542,123485.451312542,123485.451312542,123485.451312542,123485.451312542,123485.451312542,123485.451312542,123485.451312542,123485.451312542,123485.451312542,123485.451312542,123485.451312542,123485.451312542,145408.761970193,145408.761970193,145408.761970193,145408.761970193,145408.761970193,145408.761970193,145408.761970193,145408.761970193,145408.761970193,145408.761970193,145408.761970193,145408.761970193,145408.761970193,145408.761970193]},"columns":[{"id":"GEOID","name":"GEOID","type":"numeric"},{"id":"NAME","name":"NAME","type":"character"},{"id":"B01003_001","name":"B01003_001","type":"numeric"},{"id":"year","name":"year","type":"numeric"},{"id":"std_cbsa","name":"std_cbsa","type":"character"},{"id":"YEAR","name":"YEAR","type":"numeric"},{"id":"FIPS","name":"FIPS","type":"character"},{"id":"INDUSTRY","name":"INDUSTRY","type":"numeric"},{"id":"EMPLOYMENT","name":"EMPLOYMENT","type":"numeric"},{"id":"TOTAL_WAGES","name":"TOTAL_WAGES","type":"numeric"},{"id":"AVG_WAGE","name":"AVG_WAGE","type":"numeric"}],"resizable":true,"searchable":true,"highlight":true,"dataKey":"305f95115cd4b90253b5f7e97e422790"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<p><strong>Question 5: What fraction of total wages in the NYC CBSA was earned by people employed in the finance and insurance industries (NAICS code 52)? In what year did this fraction peak? </strong></p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>  YEAR finance_wages  total_wages   fraction
+1 2014  119105615711 2.587097e+12 0.04603833</code></pre>
+</div>
+</div>
+</section>
+<section id="initial-visualizations" class="level2">
+<h2 class="anchored" data-anchor-id="initial-visualizations">Initial Visualizations</h2>
+<p><strong>Relationship between monthly rent and average household income per CBSA in 2009</strong></p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mp02_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Relationship between total employment and employment in health care (NAICS 62) across CBSAs over time</strong></p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mp02_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Evolution of average household size over time by CBSA</strong></p>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Tried to calculate with group_by(), but the calculation failed.
+Falling back to ungrouped filter operation...</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: No shared levels found between `names(values)` of the manual scale and the
+data's colour values.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mp02_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="building-indices-of-housing-affordability-and-housing-stock-growth" class="level2">
+<h2 class="anchored" data-anchor-id="building-indices-of-housing-affordability-and-housing-stock-growth">Building Indices of Housing Affordability and Housing Stock Growth</h2>
+<p><strong>Standardization</strong></p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 7
+  GEOID NAME               year B25064_001 B19013_001 rent_to_income rent_burden
+  &lt;dbl&gt; &lt;chr&gt;             &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;          &lt;dbl&gt;       &lt;dbl&gt;
+1 10140 Aberdeen, WA Mic…  2009        650      36345         0.0179        35.3
+2 10180 Abilene, TX Metr…  2009        712      42931         0.0166        29.3
+3 10300 Adrian, MI Micro…  2009        645      45640         0.0141        18.0
+4 10380 Aguadilla-Isabel…  2009        363      13470         0.0269        77.4
+5 10420 Akron, OH Metro …  2009        723      47482         0.0152        23.0
+6 10500 Albany, GA Metro…  2009        624      36218         0.0172        32.3</code></pre>
+</div>
+</div>
+<p><strong>Scaling + Transformation</strong></p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 9
+  GEOID NAME        year B25064_001 B19013_001 rent_to_income rent_burden_scaled
+  &lt;dbl&gt; &lt;chr&gt;      &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;          &lt;dbl&gt;              &lt;dbl&gt;
+1 10140 Aberdeen,…  2009        650      36345         0.0179               35.3
+2 10180 Abilene, …  2009        712      42931         0.0166               29.3
+3 10300 Adrian, M…  2009        645      45640         0.0141               18.0
+4 10380 Aguadilla…  2009        363      13470         0.0269               77.4
+5 10420 Akron, OH…  2009        723      47482         0.0152               23.0
+6 10500 Albany, G…  2009        624      36218         0.0172               32.3
+# ℹ 2 more variables: rent_burden_sd &lt;dbl&gt;, rent_burden_times_baseline &lt;dbl&gt;</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'scales'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:purrr':
+
+    discard</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:readr':
+
+    col_factor</code></pre>
+</div>
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-9586bfe78ef92fbc6a0a" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-9586bfe78ef92fbc6a0a">{"x":{"filter":"none","vertical":false,"caption":"<caption>Rent Burden Trend in New York City Over Time<\/caption>","data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14"],[35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620,35620],["New York-Northern New Jersey-Long Island, NY-NJ-PA Metro Area","New York-Northern New Jersey-Long Island, NY-NJ-PA Metro Area","New York-Northern New Jersey-Long Island, NY-NJ-PA Metro Area","New York-Northern New Jersey-Long Island, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ-PA Metro Area","New York-Newark-Jersey City, NY-NJ Metro Area"],[2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2021,2022,2023],[1125,1150,1187,1209,1237,1281,1308,1346,1379,1434,1482,1600,1685,1764],[62887,61927,62322,63982,65786,67066,68743,71897,75368,78478,83160,84409,91562,95220],[0.01788922988853022,0.01857025207098681,0.01904624370206348,0.01889593948297959,0.01880339281914085,0.01910058748098888,0.0190273918799005,0.01872122619858965,0.01829688992675937,0.01827263691735263,0.01782106782106782,0.01895532466917035,0.01840283086870099,0.01852551984877127],[35.37090174586488,38.52847000739395,40.73541143420564,40.03852395538485,39.60943013733404,40.98737707639283,40.64800471403232,39.22846352582999,37.26102284818027,37.14857345266569,35.05486742803529,40.31386414833503,37.75221941194666,38.32106847367891]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>GEOID<\/th>\n      <th>NAME<\/th>\n      <th>year<\/th>\n      <th>B25064_001<\/th>\n      <th>B19013_001<\/th>\n      <th>rent_to_income<\/th>\n      <th>rent_burden_scaled<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":10,"columnDefs":[{"className":"dt-right","targets":[1,3,4,5,6,7]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"GEOID","targets":1},{"name":"NAME","targets":2},{"name":"year","targets":3},{"name":"B25064_001","targets":4},{"name":"B19013_001","targets":5},{"name":"rent_to_income","targets":6},{"name":"rent_burden_scaled","targets":7}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-4c8a0153404095b01305" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-4c8a0153404095b01305">{"x":{"filter":"none","vertical":false,"caption":"<caption>Metro Areas with Highest and Lowest Rent Burden in 2023<\/caption>","data":[["1","2"],[17340,29060],["Clearlake, CA Micro Area","Laconia, NH Micro Area"],[2023,2023],[1544,1037],[59444,97692],[0.02597402597402598,0.01061499406297343],[72.85616460237,1.643812142406739]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>GEOID<\/th>\n      <th>NAME<\/th>\n      <th>year<\/th>\n      <th>B25064_001<\/th>\n      <th>B19013_001<\/th>\n      <th>rent_to_income<\/th>\n      <th>rent_burden_scaled<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":5,"columnDefs":[{"className":"dt-right","targets":[1,3,4,5,6,7]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"GEOID","targets":1},{"name":"NAME","targets":2},{"name":"year","targets":3},{"name":"B25064_001","targets":4},{"name":"B19013_001","targets":5},{"name":"rent_to_income","targets":6},{"name":"rent_burden_scaled","targets":7}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[5,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+ℹ Please use `linewidth` instead.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mp02_files/figure-html/unnamed-chunk-13-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mp02_files/figure-html/unnamed-chunk-13-4.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="housing-growth" class="level2">
+<h2 class="anchored" data-anchor-id="housing-growth">Housing Growth</h2>
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-4ebda53a56038738e8d4" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-4ebda53a56038738e8d4">{"x":{"filter":"none","vertical":false,"caption":"<caption>Top and Bottom 5 CBSAs by Instantaneous Housing Growth<\/caption>","data":[["1","2","3","4","5","6","7","8","9","10"],["Salisbury, MD Metro Area","Myrtle Beach-Conway-North Myrtle Beach, SC Metro Area","Punta Gorda, FL Metro Area","Crestview-Fort Walton Beach-Destin, FL Metro Area","North Port-Bradenton-Sarasota, FL Metro Area","Enid, OK Metro Area","Weirton-Steubenville, WV-OH Metro Area","Morgantown, WV Metro Area","Danville, IL Micro Area","Wheeling, WV-OH Metro Area"],[2023,2023,2023,2023,2023,2023,2023,2023,2023,2023],[100,87.84882706112174,56.91473179927951,48.61949035751426,46.34570926197286,0.3543041703902544,0.2985786400945715,0.2446097799675962,0.2228022085201768,0.141958793786903]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>NAME<\/th>\n      <th>year<\/th>\n      <th>instant_growth_scaled<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[2,3]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"NAME","targets":1},{"name":"year","targets":2},{"name":"instant_growth_scaled","targets":3}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-3b4e547372efb4cebc95" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-3b4e547372efb4cebc95">{"x":{"filter":"none","vertical":false,"caption":"<caption>Top and Bottom 5 CBSAs by Rate-Based Housing Growth<\/caption>","data":[["1","2","3","4","5","6","7","8","9","10"],["Springfield, OH Metro Area","Urban Honolulu, HI Metro Area","Dalton, GA Metro Area","Brunswick-St. Simons, GA Metro Area","Anchorage, AK Metro Area","New Bern, NC Micro Area","Sierra Vista-Douglas, AZ Metro Area","Dayton-Kettering-Beavercreek, OH Metro Area","Prescott Valley-Prescott, AZ Metro Area","Twin Falls, ID Metro Area"],[2023,2023,2023,2023,2023,2023,2023,2023,2023,2023],[30.40887251917381,28.09018059964228,27.10717646978659,26.41492885978604,26.12537396555361,22.51301839222963,18.56567662082898,null,null,null]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>NAME<\/th>\n      <th>year<\/th>\n      <th>rate_growth_scaled<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[2,3]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"NAME","targets":1},{"name":"year","targets":2},{"name":"rate_growth_scaled","targets":3}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-07f8e429430aed03f6bd" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-07f8e429430aed03f6bd">{"x":{"filter":"none","vertical":false,"caption":"<caption>Top and Bottom 5 CBSAs by Composite Housing Growth Index<\/caption>","data":[["1","2","3","4","5","6","7","8","9","10"],["Salisbury, MD Metro Area","Myrtle Beach-Conway-North Myrtle Beach, SC Metro Area","Punta Gorda, FL Metro Area","Crestview-Fort Walton Beach-Destin, FL Metro Area","North Port-Bradenton-Sarasota, FL Metro Area","Danville, IL Micro Area","Wheeling, WV-OH Metro Area","Dayton-Kettering-Beavercreek, OH Metro Area","Prescott Valley-Prescott, AZ Metro Area","Twin Falls, ID Metro Area"],[2023,2023,2023,2023,2023,2023,2023,2023,2023,2023],[62.25355923152179,56.05214325737715,40.86723614798434,36.70995524390969,35.56212865123496,12.40377173484709,12.36291331040912,null,null,null]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>NAME<\/th>\n      <th>year<\/th>\n      <th>composite_growth<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[2,3]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"NAME","targets":1},{"name":"year","targets":2},{"name":"composite_growth","targets":3}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 5
+  GEOID NAME                            year rent_burden_scaled composite_growth
+  &lt;dbl&gt; &lt;chr&gt;                          &lt;dbl&gt;              &lt;dbl&gt;            &lt;dbl&gt;
+1 10140 Aberdeen, WA Micro Area         2009               35.3               NA
+2 10180 Abilene, TX Metro Area          2009               29.3               NA
+3 10300 Adrian, MI Micro Area           2009               18.0               NA
+4 10380 Aguadilla-Isabela-San Sebasti…  2009               77.4               NA
+5 10420 Akron, OH Metro Area            2009               23.0               NA
+6 10500 Albany, GA Metro Area           2009               32.3               NA</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 4006 rows containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mp02_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mp02_files/figure-html/unnamed-chunk-15-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="policy-brief" class="level2">
+<h2 class="anchored" data-anchor-id="policy-brief">Policy Brief</h2>
+<p>To promote affordable housing nationwide, Congress should establish a federal program encouraging municipalities to adopt YIMBY-friendly policies. A primary sponsor from New York City, NY, which has decreasing rent burden, strong housing growth, and a high concentration of young adults in creative and tech occupations, alongside a co-sponsor from San Francisco, CA, which has high rents, slow housing development, and comparatively fewer young households, would provide a compelling contrast. Key metrics supporting this initiative include a rent burden metric, which measures the share of income spent on rent over time, and a housing growth metric, which assesses new housing permits relative to population and population growth over a five-year window. These metrics objectively identify cities with successful YIMBY policies and those needing federal support. Mobilizing support from healthcare professionals, tech/finance workers, and young adult creative professionals, who represent significant employment in these cities, strengthens the bill’s political feasibility, as reducing rent burden benefits these groups by increasing disposable income and improving living conditions. Prioritizing cities that combine high early rent burden, decreasing trends, population growth, above-average housing growth, and strong millennial presence ensures federal resources have maximum impact while providing a clear framework for targeting and evaluating policy success.</p>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>Our analysis highlights the significant variation in housing affordability across U.S. metro areas. Cities like New York City show trends of decreasing or stabilizing rent burden over time, reflecting relative success in expanding housing supply and supporting residents’ income needs. In contrast, other metros experience extremely high or growing rent burdens, signaling that housing supply has not kept pace with demand and residents face financial strain.</p>
+<p>By combining rent, income, and household data into a rent burden metric, and comparing across years and metro areas, we can identify regions that are successfully managing housing affordability and those that need intervention. This approach provides a clear framework for policymakers: supporting metros with high rent burdens and constrained housing growth can help alleviate financial pressure, improve access to housing, and foster more equitable urban development.</p>
+<p>Ultimately, tracking these metrics over time allows for targeted strategies that prioritize cities where housing is most unaffordable, while learning from areas that have been able to expand supply effectively. This ensures that policy efforts have maximum impact in improving living conditions and economic mobility for residents across the country.</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

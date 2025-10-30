@@ -1,0 +1,14 @@
+---
+title: "Mini Project 1"
+format: html
+---
+
+st_total_hours <- GLOBAL_TOP_10 %>% filter(str_detect(show_title, regex("^Stranger Things$", ignore_case = TRUE))) %>% summarize(h = sum(weekly_hours_viewed, na.rm = TRUE)) %>% pull(h)
+format(st_total_hours, big.mark = ",")
+}total hours of viewing worldwide, remained in the global Top 10 forr {
+st_weeks <- GLOBAL_TOP_10 %>% filter(str_detect(show_title, regex("^Stranger Things$", ignore_case = TRUE))) %>% summarize(w = max(cumulative_weeks_in_top_10, na.rm = TRUE)) %>% pull(w)
+st_weeks
+}cumulative weeks, and charted inr {
+st_countries <- COUNTRY_TOP_10 %>% filter(str_detect(show_title, regex("^Stranger Things$", ignore_case = TRUE))) %>% distinct(country) %>% nrow()
+st_countries
+}` countries on debut and across its runs. Compared with other top English-language TV shows, Stranger Things ranks among the very top in both total hours viewed and multinational penetration — a demonstration of the brand’s rare combination of critical acclaim and mass appeal. Season 5 will capitalize on that scale: the series’ proven ability to drive global conversation and sustained viewing makes it poised to be one of the most-watched launches on Netflix’s platform.

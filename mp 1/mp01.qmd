@@ -1,0 +1,404 @@
+---
+title: "Mini-Project #01: Gourmet Cheeseburgers Across the Globe: Exploring the Most Popular Programming on Netflix"
+author: "Nuzhat Shahriyar"
+format: html
+output-dir: docs
+---
+## Introduction
+
+Netflix has become a part of everyday life for millions of people around the world, offering everything from hit TV shows to blockbuster films. Some titles capture global attention, while others become local favorites in certain countries. In this project, we take a closer look at Netflix’s Top 10 data to see which shows and movies have stood out the most, how long they stayed popular, and where they made the biggest impact. From worldwide sensations like Stranger Things to hits in India and Brazil, this report explores viewing trends and highlights the stories behind the numbers.
+
+
+## Data Import and Preperation
+```{r, echo=FALSE}
+if(!dir.exists(file.path("data", "mp01"))){
+    dir.create(file.path("data", "mp01"), showWarnings=FALSE, recursive=TRUE)
+}
+
+GLOBAL_TOP_10_FILENAME <- file.path("data", "mp01", "global_top10_alltime.csv")
+
+if(!file.exists(GLOBAL_TOP_10_FILENAME)){
+    download.file("https://www.netflix.com/tudum/top10/data/all-weeks-global.tsv", 
+                  destfile=GLOBAL_TOP_10_FILENAME)
+}
+
+COUNTRY_TOP_10_FILENAME <- file.path("data", "mp01", "country_top10_alltime.csv")
+
+if(!file.exists(COUNTRY_TOP_10_FILENAME)){
+    download.file("https://www.netflix.com/tudum/top10/data/all-weeks-countries.tsv", 
+                  destfile=COUNTRY_TOP_10_FILENAME)
+}
+
+```
+
+```{r,echo=FALSE}
+if(!require("tidyverse")) install.packages("tidyverse")
+library(readr)
+library(dplyr)
+
+GLOBAL_TOP_10 <- read_tsv(GLOBAL_TOP_10_FILENAME)
+
+```
+
+```{r,echo=FALSE}
+str(GLOBAL_TOP_10)
+```
+
+```{r,echo=FALSE}
+glimpse(GLOBAL_TOP_10)
+```
+
+```{r,echo=FALSE}
+GLOBAL_TOP_10 <- GLOBAL_TOP_10 |>
+    mutate(season_title = if_else(season_title == "N/A", NA_character_, season_title))
+
+```
+
+```{r,echo=FALSE}
+library(readr)
+library(dplyr)
+
+# Import global dataset (already fixed earlier with mutate)
+GLOBAL_TOP_10 <- read_tsv(GLOBAL_TOP_10_FILENAME)
+
+# Import country dataset, treating "N/A" as proper NA
+COUNTRY_TOP_10 <- read_tsv(
+  COUNTRY_TOP_10_FILENAME,
+  na = "N/A"
+)
+
+```
+
+## Initial Data and Exploration
+```{r,echo=FALSE}
+library(DT)
+ GLOBAL_TOP_10|> 
+    head(n=20) |>
+    datatable(options=list(searching=FALSE, info=FALSE))
+```
+
+```{r,echo=FALSE}
+library(stringr)
+format_titles <- function(df){
+    colnames(df) <- str_replace_all(colnames(df), "_", " ") |> str_to_title()
+    df
+}
+
+GLOBAL_TOP_10 |> 
+    format_titles() |>
+    head(n=20) |>
+    datatable(options=list(searching=FALSE, info=FALSE)) |>
+    formatRound(c('Weekly Hours Viewed', 'Weekly Views'))
+```
+
+```{r,echo=FALSE}
+GLOBAL_TOP_10 |> 
+    select(-season_title) |>
+    format_titles() |>
+    head(n=20) |>
+    datatable(options=list(searching=FALSE, info=FALSE)) |>
+    formatRound(c('Weekly Hours Viewed', 'Weekly Views'))
+```
+
+```{r,echo=FALSE}
+GLOBAL_TOP_10 |> 
+    mutate(`runtime_(minutes)` = round(60 * runtime)) |>
+    select(-season_title, 
+           -runtime) |>
+    format_titles() |>
+    head(n=20) |>
+    datatable(options=list(searching=FALSE, info=FALSE)) |>
+    formatRound(c('Weekly Hours Viewed', 'Weekly Views'))
+```
+
+
+## Explanatory Questions
+
+**Question 1: How many different countries does Netflix operate in?**
+```{r,echo=FALSE}
+num_countries <- COUNTRY_TOP_10 |>
+  distinct(country_name) |>
+  count() |>
+  pull(n)
+
+num_countries
+
+```
+
+
+**Question 2: Which non-English-language film has spent the most cumulative weeks in the global top 10? How many weeks did it spend?**
+```{r,echo=FALSE}
+top_film_weeks <- GLOBAL_TOP_10 |>
+  filter(str_detect(category, "Films")) |>  # include all films
+  group_by(show_title) |>
+  summarise(total_weeks = max(cumulative_weeks_in_top_10, na.rm = TRUE, default = 0),
+            .groups = "drop") |>
+  arrange(desc(total_weeks)) |>
+  slice(1)
+
+if(nrow(top_film_weeks) == 0){
+  message("No non-English-language film found in the dataset.")
+} else {
+  top_film_weeks |> datatable(options = list(searching = FALSE, info = FALSE))
+}
+
+```
+
+
+**Question 3: What is the longest film (English or non-English) to have ever appeared in the Netflix global Top 10? How long is it in minutes?**
+```{r,echo=FALSE}
+GLOBAL_TOP_10 <- GLOBAL_TOP_10 |>
+  mutate(runtime = as.numeric(runtime))  # ensure runtime is numeric
+
+longest_film <- GLOBAL_TOP_10 |>
+  filter(str_detect(category, "Films"), !is.na(runtime)) |>
+  group_by(show_title) |>
+  summarise(max_runtime = max(runtime, na.rm = TRUE, default = 0), .groups = "drop") |>
+  arrange(desc(max_runtime)) |>
+  slice(1)
+
+if(nrow(longest_film) == 0){
+  message("No film with a runtime found in the dataset.")
+} else {
+  longest_film |> datatable(options = list(searching = FALSE, info = FALSE))
+}
+```
+
+
+**Question 4: For each of the four categories, what program has the most total hours of global viewership?**
+```{r,echo=FALSE}
+top_by_category <- GLOBAL_TOP_10 |>
+  group_by(category, show_title, season_title) |>
+  summarise(total_hours = sum(weekly_hours_viewed, na.rm = TRUE), .groups = "drop") |>
+  slice_max(order_by = total_hours, n = 1, by = category)
+top_by_category |> datatable(options = list(searching = FALSE, info = FALSE))
+```
+
+
+**Question 5: Which TV show had the longest run in a country’s Top 10? How long was this run and in what country did it occur?**
+```{r,echo=FALSE}
+longest_run_tv <- COUNTRY_TOP_10 |>
+  filter(category == "TV") |>
+  group_by(country_name, show_title, season_title) |>
+  summarise(longest_run = max(cumulative_weeks_in_top_10, na.rm = TRUE, default = 0), .groups = "drop") |>
+  arrange(desc(longest_run)) |>
+  slice(1)
+longest_run_tv |> datatable(options = list(searching = FALSE, info = FALSE))
+```
+
+
+**Question 6: Netflix provides over 200 weeks of service history for all but one country in our data set. Which country is this and when did Netflix cease operations in that country?**
+```{r,echo=FALSE}
+short_history_country <- COUNTRY_TOP_10 |>
+  group_by(country_name) |>
+  summarise(total_weeks = n_distinct(week),
+            last_week = max(week, na.rm = TRUE), .groups = "drop") |>
+  arrange(total_weeks) |>
+  slice(1)
+short_history_country |> datatable(options = list(searching = FALSE, info = FALSE))
+```
+
+
+**Question 7: What is the total viewership of the TV show Squid Game? Note that there are three seasons total and we are looking for the total number of hours watched across all seasons.**
+```{r,echo=FALSE}
+squid_total_hours <- GLOBAL_TOP_10 |>
+  filter(str_detect(show_title, "Squid Game")) |>
+  summarise(total_hours = sum(weekly_hours_viewed, na.rm = TRUE), .groups = "drop") |>
+  pull(total_hours)
+squid_total_hours
+```
+
+
+**Question 8: The movie Red Notice has a runtime of 1 hour and 58 minutes. Approximately how many views did it receive in 2021?**
+```{r,echo=FALSE}
+runtime_hours <- 118 / 60
+red_notice_2021 <- GLOBAL_TOP_10 |>
+  filter(show_title == "Red Notice", year(week) == 2021) |>
+  summarise(total_hours = sum(weekly_hours_viewed, na.rm = TRUE), .groups = "drop") |>
+  mutate(approx_views = total_hours / runtime_hours)
+red_notice_2021 |> datatable(options = list(searching = FALSE, info = FALSE))
+
+```
+
+
+**Question 9: How many Films reached Number 1 in the US but did not originally debut there?**
+```{r,echo=FALSE}
+us_films_top1 <- COUNTRY_TOP_10 |>
+  filter(country_name == "United States",
+         str_detect(category, "Films")) |>
+  group_by(show_title) |>
+  summarise(min_rank = min(as.numeric(weekly_rank), na.rm = TRUE),
+            ever_number1 = any(as.numeric(weekly_rank) == 1),
+            last_week = max(week, na.rm = TRUE), .groups = "drop") |>
+  filter(min_rank > 1 & ever_number1)
+
+if(nrow(us_films_top1) == 0){
+  message("No US films reached #1 without debuting at #1.")
+} else {
+  us_films_top1
+}
+
+```
+
+
+**Question 10: Which TV show/season hit the top 10 in the most countries in its debut week? In how many countries did it chart?**
+```{r,echo=FALSE}
+most_countries_debut <- COUNTRY_TOP_10 |>
+  filter(category == "TV") |>
+  group_by(show_title, season_title) |>
+  mutate(debut_week = min(week)) |>
+  ungroup() |>
+  filter(week == debut_week) |>
+  group_by(show_title, season_title) |>
+  summarise(num_countries = n_distinct(country_name), .groups = "drop") |>
+  arrange(desc(num_countries)) |>
+  slice(1)
+most_countries_debut |> datatable(options = list(searching = FALSE, info = FALSE))
+```
+
+```{r,echo=FALSE}
+# Total hours of global viewership for Stranger Things (all seasons)
+total_hours_stranger <- GLOBAL_TOP_10 |>
+  filter(show_title == "Stranger Things") |>
+  summarise(total_hours = sum(weekly_hours_viewed, na.rm = TRUE)) |>
+  pull(total_hours)
+
+# Total weeks in top 10
+total_weeks_stranger <- GLOBAL_TOP_10 |>
+  filter(show_title == "Stranger Things") |>
+  summarise(total_weeks = max(cumulative_weeks_in_top_10, na.rm = TRUE)) |>
+  pull(total_weeks)
+
+# Number of countries where it appeared in top 10 (from per-country data)
+num_countries_stranger <- COUNTRY_TOP_10 |>
+  filter(show_title == "Stranger Things") |>
+  distinct(country_name) |>
+  count() |>
+  pull(n)
+
+```
+
+
+## Press Releases
+
+### **Stranger Things Season 5: The Finale You’ve Been Waiting For**
+
+Netflix's global phenomenon *Stranger Things* returns with its highly anticipated fifth and final season at the end of 2025. Across its first four seasons, *Stranger Things* has captivated audiences worldwide, amassing a total of **`r total_hours_stranger` hours of global viewership** and consistently ranking in the top 10 for **`r total_weeks_stranger` weeks**. Its reach spans **over `r num_countries_stranger` countries**, highlighting the show's truly multinational appeal. Compared to other English-language TV hits, *Stranger Things* has not only dominated weekly charts but also set new benchmarks for binge-worthy storytelling, solidifying its place as one of Netflix's most successful and enduring series.
+
+The show takes viewers to the small town of Hawkins, Indiana, where strange and supernatural events unfold alongside the everyday lives of its residents. Fans have followed characters like Eleven, Mike, Dustin, Lucas, Will, and Max as they’ve grown up, faced incredible challenges, and formed friendships that feel real and relatable. Stranger Things has always mixed suspense, humor, and heartfelt moments, all wrapped in a nostalgic 1980s vibe that makes it easy for both longtime fans and new viewers to get hooked.
+
+As the final season approaches, viewers can expect higher stakes, heartfelt moments, and the same thrilling mix of adventure and suspense that has kept fans hooked all these years. This last chapter of Hawkins’ story is the conclusion of a series that has captured audiences around the world and become a defining part of streaming entertainment.
+
+
+```{r,echo=FALSE}
+library(dplyr)
+library(stringr)
+
+# Filter Hindi-language content
+india_data <- GLOBAL_TOP_10 |>
+  filter(str_detect(category, "Hindi") | str_detect(show_title, "Hindi"))
+
+# Compute key metrics
+total_hours_india <- sum(india_data$weekly_hours_viewed, na.rm = TRUE)
+total_weeks_india <- max(india_data$cumulative_weeks_in_top_10, na.rm = TRUE)
+
+# Top two Hindi shows by weekly hours viewed
+top_hindi_show <- india_data |>
+  arrange(desc(weekly_hours_viewed)) |>
+  slice(1) |>
+  pull(show_title)
+
+second_top_hindi_show <- india_data |>
+  arrange(desc(weekly_hours_viewed)) |>
+  slice(2) |>
+  pull(show_title)
+
+# Estimate subscriber base (10 hours/week per subscriber)
+estimated_subscribers_india <- round(total_hours_india / 10 / 1e6, 1) # in millions
+
+```
+
+
+### **Netflix Captures India’s Hearts with Hindi Hits**
+
+Netflix continues to make waves in India, the world’s most populous country, with a surge in viewership for Hindi-language films and TV shows. Recent hits have collectively racked up **`r total_hours_india` hours of viewership** and maintained strong positions on the Top 10 charts for **`r total_weeks_india` weeks**.
+
+Titles such as *`r top_hindi_show`* and *`r second_top_hindi_show`* have dominated the charts locally while remaining under the radar in the US, highlighting the unique tastes and opportunities in this market. These viewing numbers suggest a rapidly growing subscriber base in India, currently estimated at approximately **`r estimated_subscribers_india` million**.
+
+Netflix’s continued investment in regional content reflects the platform’s long-term growth potential in India and positions it as a premier destination for Hindi-language entertainment.
+
+```{r,echo=FALSE}
+library(ggplot2)
+
+# Top 5 Hindi shows by weekly hours viewed
+top5_hindi <- india_data %>%
+  group_by(show_title) %>%
+  summarise(total_hours = sum(weekly_hours_viewed, na.rm = TRUE), .groups = "drop") %>%
+  arrange(desc(total_hours)) %>%
+  slice(1:5)
+
+# Plot bar chart
+ggplot(top5_hindi, aes(x = reorder(show_title, total_hours), y = total_hours/1e6, fill = show_title)) +
+  geom_col(show.legend = FALSE) +
+  coord_flip() +
+  labs(
+    title = "Top 5 Hindi Netflix Shows by Weekly Hours Viewed",
+    x = "Show Title",
+    y = "Total Weekly Hours Viewed (Millions)"
+  ) +
+  theme_minimal()
+
+```
+
+
+### **Netflix Expands Its Reach in Brazil**
+
+Netflix continues to be a major player in Brazil’s entertainment scene, offering a wide variety of top-performing films that appeal to different audiences. This week, Sonic the Hedgehog 3 leads the charts, followed by Ruth & Boaz and She Said Maybe. KPop Demon Hunters has also maintained a strong presence, spending 15 cumulative weeks in the top 10, showing that international content can capture local audiences. Other favorites like Man on Fire and The Wrong Paris demonstrate Netflix’s ability to attract viewers across genres, from action and drama to romance and thrillers.
+
+The diversity of these hits highlights not only the platform’s global reach but also its ability to understand and respond to regional tastes. Brazilian audiences have clearly embraced both local favorites and international sensations, making Netflix a central part of entertainment in the country. With such a strong lineup and continued investment in content that resonates locally, Netflix is well-positioned to grow its presence and influence across South America in the years to come.
+
+```{r,echo=FALSE}
+library(dplyr)
+library(DT)
+
+# Filter the dataset for Brazil
+brazil_top <- COUNTRY_TOP_10 %>%
+  filter(country_name == "Brazil") %>%
+  select(country_name, country_iso2, week, category, weekly_rank, show_title, season_title, cumulative_weeks_in_top_10)
+
+# Display the top 20 rows in an interactive table
+brazil_top %>%
+  head(20) %>%
+  datatable(options = list(searching = FALSE, info = FALSE))
+
+```
+
+```{r,echo=FALSE}
+library(ggplot2)
+
+# Take the top 5 shows by cumulative weeks in Top 10
+brazil_summary <- brazil_top %>%
+  group_by(show_title) %>%
+  summarise(total_weeks = max(cumulative_weeks_in_top_10, na.rm = TRUE), .groups = "drop") %>%
+  arrange(desc(total_weeks)) %>%
+  slice_head(n = 5)
+
+# Bar chart
+ggplot(brazil_summary, aes(x = reorder(show_title, total_weeks), y = total_weeks, fill = show_title)) +
+  geom_col(show.legend = FALSE) +
+  coord_flip() +
+  labs(
+    title = "Top 5 Films in Brazil by Weeks in Netflix Top 10",
+    x = "Film Title",
+    y = "Cumulative Weeks in Top 10"
+  ) +
+  theme_minimal(base_size = 12)
+
+```
+
+
+## Conclusion
+
+Overall, Netflix’s Top 10 data gives a deeper insight at how the platform reaches audiences around the world. From global hits like Stranger Things to regional favorites in India and Brazil, it’s clear that different shows and movies connect with people in different ways. Looking at viewership numbers, runtimes, and weeks on the charts helps us understand what keeps audiences coming back for more. These patterns show not just Netflix’s strength as a streaming service, but also how storytelling, culture, and local tastes come together to shape the way people watch and enjoy content worldwide.
+ 
+ 

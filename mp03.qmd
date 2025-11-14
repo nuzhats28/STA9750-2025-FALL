@@ -453,32 +453,39 @@ Queens District 25 faces ongoing challenges with maintaining a healthy and conti
 
 ***Number 1:***vquarto::quarto_render("mp03.qmd")
 
-```{r}
-# Extra Credit: Interactive Tree Map with Leaflet
-library(leaflet)
+```{r, message=FALSE, warning=FALSE}
+# Load required packages
+library(sf)       # for spatial data
+library(leaflet)  # for interactive maps
 
-# Create a leaflet map of all trees
+# Step 1: Load the NYC City Council districts GeoJSON
+nycc_districts <- st_read("data/mp03/nycc_districts.geojson")
+
+# Optional: inspect the data
+print(nycc_districts)
+class(nycc_districts)  # should show "sf"
+
+# Step 2: Simplify polygons (optional, makes map lighter/faster)
+nycc_districts_simple <- st_simplify(nycc_districts, dTolerance = 50)
+
+# Step 3: Create the interactive map
 leaflet() %>%
-  addProviderTiles(providers$CartoDB.Positron) %>%
-  addPolygons(data = nycc_districts, 
-              color = "darkgreen", 
-              weight = 1, 
-              fillOpacity = 0.1,
-              label = ~paste("District:", coun_dist)) %>%
-  addCircleMarkers(data = trees_with_district, 
-                   radius = 2, 
-                   color = "forestgreen", 
-                   stroke = FALSE, 
-                   fillOpacity = 0.5,
-                   popup = ~paste("Species:", genusspecies,
-                                  "<br>Condition:", tpcondition)) %>%
-  setView(lng = -73.94, lat = 40.70, zoom = 10) %>%
-  addLegend(position = "bottomright", 
-            colors = "forestgreen", 
-            labels = "Trees",
-            title = "NYC Trees")
+  addProviderTiles(providers$CartoDB.Positron) %>%  # base map
+  addPolygons(
+    data = nycc_districts_simple,
+    color = "darkgreen",     # district borders
+    weight = 0.5,            # thinner lines
+    fillOpacity = 0.1        # lighter fill
+  ) %>%
+  addLegend(
+    position = "bottomright",
+    colors = "darkgreen",
+    labels = "NYC Council Districts",
+    opacity = 0.7
+  )
 
 ```
+
 
 ***Number 2:***
 ```{r, message=FALSE, warning=FALSE}

@@ -407,19 +407,6 @@ ggplot(comparison_districts, aes(x = factor(coun_dist), y = total_plane, fill = 
   theme(legend.position = "none")
 ```
 
-```{r}
-# Another Queens district for comparison (e.g., District 24)
-other_district <- nycc_districts %>% filter(coun_dist == 24)
-
-ggplot() +
-  geom_sf(data = other_district, fill = "lightblue", color = "darkblue") +
-  geom_sf(data = nycc_districts %>% filter(coun_dist == 25), fill = NA, color = "red", size = 1) +
-  geom_sf(data = plane_trees, aes(color = genusspecies), size = 0.8, alpha = 0.7) +
-  labs(title = "London Plane Trees: District 25 vs District 24") +
-  theme_minimal()
-
-```
-
 ## NYC Parks Proposal: Planting London Plane Trees in Queens District 25
 
 **Project Description:**  
@@ -451,7 +438,7 @@ Queens District 25 faces ongoing challenges with maintaining a healthy and conti
 
 ## Extra Credit
 
-***Number 1:***vquarto::quarto_render("mp03.qmd")
+***Number 1:***
 
 ```{r, message=FALSE, warning=FALSE}
 # Load required packages

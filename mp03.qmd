@@ -1,13 +1,11 @@
 ---
 title: "Mini-Project #03: Visualizing and Maintaining the Green Canopy of NYC"
 author: "Nuzhat Shahriyar"
-format:
-  html:
-    code-fold: true       
-output-dir: docs  
+format: html
+output-dir: docs 
 ---
 
-```{r setup,include=FALSE}
+```{r setup,echo=FALSE,include=FALSE}
 library(sf)
 library(tidyverse)
 
@@ -24,7 +22,7 @@ New York City’s urban forest plays a critical role in improving air quality, p
 
 ## Data Acquisition
 ***Task 1***
-```{r download-data, include=FALSE, message=FALSE, warning=FALSE}
+```{r download-data, include=FALSE, echo=FALSE,message=FALSE, warning=FALSE}
 # Define file paths
 zip_path <- "data/mp03/nycc.zip"
 unzip_dir <- "data/mp03/nycc_shp"
@@ -34,7 +32,7 @@ url_primary <- "https://data.cityofnewyork.us/download/gqij-kd3p/application/zip
 
 ```
 
-```{r, message=FALSE, warning=FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 library(sf)
 library(dplyr)
 
@@ -84,7 +82,7 @@ plot(st_geometry(nycc_districts),
 ```
 ***Task 2***
 Downloading Data
-```{r,include=FALSE}
+```{r,echo=FALSE,include=FALSE}
 # ----------------------------------------------------------------------------
 # Task 2: Download & Read NYC Tree Points
 # ----------------------------------------------------------------------------
@@ -148,7 +146,7 @@ print(nyc_trees %>% slice_head(n = 5))
 
 ```
 
-```{r, include=FALSE}
+```{r,echo=FALSE, include=FALSE}
 # ----------------------------------------------------------------------------
 # Task 2: Download & Read NYC Tree Points
 # ----------------------------------------------------------------------------
@@ -213,7 +211,7 @@ print(nyc_trees %>% slice_head(n = 5))
 ```
 
 ***Task 3***
-```{r}
+```{r,echo=FALSE}
 # ----------------------------------------------------------------------------
 # Task 3: Map NYC Trees over City Council Districts
 # ----------------------------------------------------------------------------
@@ -246,7 +244,7 @@ ggplot() +
 ```
 
 ***Task 4***
-```{r, include=FALSE}
+```{r,echo=FALSE, include=FALSE}
 # Load libraries
 library(sf)
 library(dplyr)
@@ -259,7 +257,7 @@ trees_with_district <- st_join(nyc_trees, nycc_districts, join = st_within)
 ```
 
 **Question 1:Which council district has the most trees?**
-```{r}
+```{r,echo=FALSE}
 tree_counts <- trees_with_district %>%
 st_drop_geometry() %>%
 group_by(coun_dist) %>%
@@ -275,7 +273,7 @@ most_trees_district, most_trees_count))
 ```
 
 **Question 2: Which council district has the highest density of trees? The Shape_Area column from the district shape file will be helpful here.**
-```{r}
+```{r,echo=FALSE}
 trees_density <- trees_with_district %>%
   st_drop_geometry() %>%
   group_by(coun_dist, Shape__Area) %>%
@@ -292,7 +290,7 @@ message(sprintf("District with highest tree density: %s (%.4f trees per m²)",
 ```
 
 **Question 3: Which district has highest fraction of dead trees out of all trees?**
-```{r}
+```{r,echo=FALSE}
 dead_fraction <- trees_with_district %>%
   st_drop_geometry() %>%
   group_by(coun_dist) %>%
@@ -313,7 +311,7 @@ message(sprintf("District with highest fraction of dead trees: %s (%.2f%%)",
 ```
 
 **Question 4: What is the most common tree species in Manhattan?**
-```{r}
+```{r,echo=FALSE}
 # Add borough column based on district
 
 trees_with_district <- trees_with_district %>%
@@ -340,7 +338,7 @@ message(sprintf("Most common tree species in Manhattan: %s", most_common_manhatt
 ```
 
 **Question 5: What is the species of the tree closest to Baruch’s campus?**
-```{r}
+```{r,echo=FALSE}
 # Function to create an sf point for Baruch College
 new_st_point <- function(lat, lon, ...) {
   st_sfc(st_point(c(lon, lat)), crs = 4326)
@@ -362,7 +360,7 @@ message(sprintf("Species of tree closest to Baruch College: %s", closest_species
 ```
 
 ## Government Planning Design
-```{r, include=FALSE}
+```{r, echo=FALSE, include=FALSE}
 # Filter Queens district (example: District 25 in Queens)
 queens_district <- trees_with_district %>% filter(coun_dist == 25)
 
@@ -371,7 +369,7 @@ plane_trees <- queens_district %>% filter(genusspecies == "Platanus × acerifoli
 
 ```
 
-```{r}
+```{r,echo=FALSE}
 library(ggplot2)
 
 ggplot() +
@@ -384,7 +382,7 @@ ggplot() +
 
 ```
 
-```{r}
+```{r,echo=FALSE}
 library(stringr)
 
 # Compare number of London Plane trees across 4 Queens districts
@@ -440,7 +438,7 @@ Queens District 25 faces ongoing challenges with maintaining a healthy and conti
 
 ***Number 1:***
 
-```{r, message=FALSE, warning=FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # Load required packages
 library(sf)       # for spatial data
 library(leaflet)  # for interactive maps
@@ -475,7 +473,7 @@ leaflet() %>%
 
 
 ***Number 2:***
-```{r, message=FALSE, warning=FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 # Extra Credit #2: Polite CSV download using download.file
 # Create directory if needed
 dir.create("data/mp03", showWarnings = FALSE)

@@ -1,0 +1,593 @@
+---
+title: "Mini-Project #02: Making Backyards Affordable for All"
+author: "Nuzhat Shahriyar"
+format: html
+output-dir: docs
+---
+
+```{r,echo=FALSE, include=FALSE}
+# Load libraries
+library(tidyverse)
+library(dplyr)
+library(stringr)
+library(tidycensus)
+library(glue)
+library(readxl)
+library(httr2)
+library(rvest)
+
+# Load CSV files you already downloaded
+PERMITS <- read_csv("data/mp02/housing_units_2009_2023.csv", show_col_types = FALSE)
+INCOME <- read_csv("data/mp02/B19013_001_cbsa_2009_2023.csv", show_col_types = FALSE)
+RENT <- read_csv("data/mp02/B25064_001_cbsa_2009_2023.csv", show_col_types = FALSE)
+POPULATION <- read_csv("data/mp02/B01003_001_cbsa_2009_2023.csv", show_col_types = FALSE)
+HOUSEHOLDS <- read_csv("data/mp02/B11001_001_cbsa_2009_2023.csv", show_col_types = FALSE)
+INDUSTRY_CODES <- read_csv("data/mp02/bls_industry_codes.csv", show_col_types = FALSE)
+WAGES <- read_csv("data/mp02/bls_qcew_2009_2023.csv.gz", show_col_types = FALSE)
+```
+
+
+## Introduction
+
+Finding affordable housing in U.S. cities can feel like a moving target—some metro areas seem to keep up with demand, while others struggle to provide enough homes for their residents. In this analysis, we dive into the numbers to understand why. We combine several datasets: PERMITS, which tracks new housing units authorized each year; HOUSEHOLDS, which tells us about average household sizes; and RENT, which records monthly rent levels. By connecting these datasets through geographic identifiers, we can see how housing supply, affordability, and demographics interact over time.
+
+We start with simple but telling questions: Which cities are building the most new housing? Where are households growing or shrinking? Which areas have the highest incomes, and how do local industries like finance, tech, and healthcare shape employment trends? From there, we dig deeper, creating indices of housing affordability (how much of a household’s income goes to rent) and housing growth (new units relative to population growth). These measures highlight metros that are successfully expanding housing versus those struggling to keep up. By looking at trends over time, we can better understand which cities are making housing more accessible and which ones might need extra support—offering a clear picture of how policy, economics, and demographics intersect in shaping our urban landscape.
+
+```{r,echo=FALSE}
+library(DiagrammeR)
+
+grViz("
+digraph G {
+  graph [
+    rankdir=LR, 
+    fontsize=12, 
+    nodesep=0.3,       # space between nodes horizontally
+    ranksep=0.5        # space between ranks vertically
+  ]
+  
+  node [
+    shape=record, 
+    style=filled, 
+    fillcolor=LightBlue, 
+    fontname=Helvetica, 
+    width=1.5, 
+    height=0.8
+  ]
+
+  # Nodes
+  PERMITS [label='{PERMITS | CBSA | year | new_housing_units_permitted}']
+  HOUSEHOLDS [label='{HOUSEHOLDS | GEOID | year | B11001_001 (avg_household_size)}']
+  RENT [label='{RENT | GEOID | year | monthly_rent}']
+
+  # Edges
+  PERMITS -> HOUSEHOLDS [label='CBSA -> GEOID', fontsize=10]
+  HOUSEHOLDS -> RENT [label='GEOID', fontsize=10]
+}
+")
+
+```
+
+## Data Integration and Initial Exploration
+
+**Question 1:Which CBSA permitted the largest number of new housing units in the decade from 2010 to 2019 (inclusive)? **
+```{r,echo=FALSE}
+# Largest number of new housing units, 2010–2019
+PERMITS %>%
+  filter(year >= 2010, year <= 2019) %>%
+  group_by(CBSA) %>%
+  summarise(
+    total_permits = sum(new_housing_units_permitted, na.rm = TRUE)
+  ) %>%
+  arrange(desc(total_permits)) %>%
+  left_join(
+    INCOME %>% select(GEOID, NAME),
+    by = c("CBSA" = "GEOID")
+  ) %>%
+  slice(1) %>%
+  as.data.frame()
+
+
+```
+
+**Question 2: In what year did Albuquerque, NM (CBSA 10740) permit the most new housing units? **
+```{r,echo=FALSE}
+# Albuquerque peak permit year
+PERMITS %>%
+  filter(CBSA == 10740) %>%
+  arrange(desc(new_housing_units_permitted)) %>%
+  slice(1) %>%
+  as.data.frame()
+
+```
+
+**Question 3: Which state had the highest average individual income in 2015? **
+```{r,echo=FALSE}
+library(dplyr)
+library(stringr)
+
+state_df <- data.frame(
+  abb = c(state.abb, "DC", "PR"),
+  name = c(state.name, "District of Columbia", "Puerto Rico")
+)
+
+acs_2015 <- INCOME %>%
+  filter(year == 2015) %>%
+  left_join(HOUSEHOLDS %>% filter(year == 2015), by = c("GEOID", "NAME", "year")) %>%
+  left_join(POPULATION %>% filter(year == 2015), by = c("GEOID", "NAME", "year")) %>%
+  mutate(
+    total_income = B19013_001 * B11001_001,
+    total_population = B01003_001
+  )
+
+acs_2015 <- acs_2015 %>%
+  mutate(
+    state = str_extract(NAME, ", (.{2})"),
+    state = str_remove_all(state, ", ")
+  )
+
+state_income <- acs_2015 %>%
+  group_by(state) %>%
+  summarise(
+    total_income = sum(total_income, na.rm = TRUE),
+    total_population = sum(total_population, na.rm = TRUE)
+  ) %>%
+  mutate(avg_income = total_income / total_population) %>%
+  arrange(desc(avg_income))
+
+# Show the top state as a base R data frame
+as.data.frame(state_income[1, ])
+
+```
+
+**Question 4: What is the last year in which the NYC CBSA had the most data scientists (NAICS 5182)? **
+```{r,echo=FALSE}
+library(dplyr)
+library(stringr)
+library(reactable)
+
+# Standardize CBSA IDs for joining
+census_cbsa <- POPULATION %>%
+  mutate(std_cbsa = paste0("C", GEOID))
+
+bls_cbsa <- WAGES %>%
+  filter(INDUSTRY == 5182) %>%
+  mutate(std_cbsa = paste0(FIPS, "0"))
+
+# Join tables and find top CBSA per year
+ds_cbsa <- inner_join(
+  census_cbsa,
+  bls_cbsa,
+  by = "std_cbsa",
+  relationship = "many-to-many"
+) %>%
+  group_by(YEAR) %>%
+  slice_max(EMPLOYMENT, n = 1)
+
+# Filter for New York and display as an interactive, collapsible table
+ds_cbsa_nyc <- ds_cbsa %>%
+  filter(str_detect(NAME, "New York")) %>%
+  as.data.frame()
+
+reactable(
+  ds_cbsa_nyc,
+  searchable = TRUE,
+  sortable = TRUE,
+  resizable = TRUE,
+  highlight = TRUE
+)
+
+
+```
+
+**Question 5: What fraction of total wages in the NYC CBSA was earned by people employed in the finance and insurance industries (NAICS code 52)? In what year did this fraction peak? **
+```{r,echo=FALSE}
+library(dplyr)
+library(stringr)
+
+# NYC finance wages
+nyc_finance <- WAGES %>%
+  filter(str_detect(FIPS, "C3562"), INDUSTRY == 52) %>%
+  group_by(YEAR) %>%
+  summarise(finance_wages = sum(TOTAL_WAGES, na.rm = TRUE))
+
+# NYC total wages
+nyc_total <- WAGES %>%
+  filter(str_detect(FIPS, "C3562")) %>%
+  group_by(YEAR) %>%
+  summarise(total_wages = sum(TOTAL_WAGES, na.rm = TRUE))
+
+# Compute fraction and peak year
+nyc_fraction <- nyc_finance %>%
+  left_join(nyc_total, by = "YEAR") %>%
+  mutate(fraction = finance_wages / total_wages) %>%
+  arrange(desc(fraction))
+
+# Show the year fraction peaked as a standard data frame
+as.data.frame(nyc_fraction %>% slice(1))
+
+```
+
+## Initial Visualizations
+
+**Relationship between monthly rent and average household income per CBSA in 2009**
+```{r,echo=FALSE}
+library(ggplot2)
+library(dplyr)
+
+# Merge RENT and INCOME for 2009
+rent_income_2009 <- RENT %>%
+  filter(year == 2009) %>%
+  left_join(INCOME %>% filter(year == 2009), by = c("GEOID", "NAME", "year"))
+
+# Plot
+ggplot(rent_income_2009, aes(x = B19013_001, y = B25064_001)) +
+  geom_point(color = "#2c7fb8", alpha = 0.7, size = 3) +
+  labs(
+    title = "Relationship Between Monthly Rent and Average Household Income (2009)",
+    x = "Average Household Income ($)",
+    y = "Median Monthly Rent ($)"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    axis.title = element_text(size = 14)
+  )
+
+```
+
+**Relationship between total employment and employment in health care (NAICS 62) across CBSAs over time**
+```{r,echo=FALSE}
+library(dplyr)
+library(ggplot2)
+
+# Summarize total employment and health care employment by CBSA and year
+health_emp <- WAGES %>%
+  group_by(FIPS, YEAR) %>%
+  summarise(
+    total_employment = sum(EMPLOYMENT, na.rm = TRUE),
+    health_employment = sum(EMPLOYMENT[INDUSTRY == 62], na.rm = TRUE),
+    .groups = "drop"  # suppress the grouped output message
+  )
+
+# Create the plot
+ggplot(health_emp, aes(x = total_employment, y = health_employment, color = as.factor(FIPS))) +
+  geom_point(alpha = 0.6) +
+  geom_smooth(method = "lm", se = FALSE, linetype = "dashed", color = "black", formula = y ~ x) +
+  facet_wrap(~YEAR) +
+  labs(
+    title = "Health Care & Social Services Employment vs Total Employment Across CBSAs",
+    subtitle = "Each panel shows a different year",
+    x = "Total Employment (All Industries)",
+    y = "Employment in Health Care & Social Services (NAICS 62)",
+    color = "CBSA (FIPS)"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    legend.position = "bottom",
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+```
+
+**Evolution of average household size over time by CBSA**
+```{r,echo=FALSE}
+library(dplyr)
+library(ggplot2)
+library(gghighlight)
+
+# Prepare data
+household_data <- HOUSEHOLDS %>%
+  select(NAME, year, B11001_001)
+
+# Plot evolution of household size
+ggplot(household_data, aes(x = year, y = B11001_001, group = NAME, color = NAME)) +
+  geom_line(linewidth = 1) +  # use linewidth instead of size
+  gghighlight(
+    NAME %in% c(
+      "New York-Newark-Jersey City, NY-NJ-PA",
+      "Los Angeles-Long Beach-Anaheim, CA"
+    ),
+    unhighlighted_params = list(alpha = 0.2, color = "red"),
+    use_direct_label = FALSE,
+    label_key = NULL
+  ) +
+  scale_color_manual(values = c(
+    "New York-Newark-Jersey City, NY-NJ-PA" = "red",
+    "Los Angeles-Long Beach-Anaheim, CA" = "red",
+    .default = "red"  # all other CBSAs in grey
+  )) +
+  labs(
+    title = "Evolution of Average Household Size Over Time",
+    subtitle = "Highlighted: NYC and Los Angeles CBSAs",
+    x = "Year",
+    y = "Average Household Size",
+    color = "CBSA"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    legend.position = "bottom",
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+```
+
+## Building Indices of Housing Affordability and Housing Stock Growth
+
+**Standardization**
+```{r,echo=FALSE}
+library(dplyr)
+
+# Join INCOME and RENT tables
+rent_income_df <- INCOME %>%
+  inner_join(RENT, by = c("GEOID", "NAME", "year")) %>%
+  mutate(
+    # Calculate rent-to-income ratio (B25064_001 = rent, B19013_001 = income)
+    rent_to_income = B25064_001 / B19013_001,
+    
+    # Standardize ratio: 0 = lowest, 100 = highest in the dataset
+    rent_burden = 100 * (rent_to_income - min(rent_to_income, na.rm = TRUE)) /
+      (max(rent_to_income, na.rm = TRUE) - min(rent_to_income, na.rm = TRUE))
+  ) %>%
+  select(
+    GEOID, 
+    NAME, 
+    year, 
+    B25064_001, 
+    B19013_001, 
+    rent_to_income, 
+    rent_burden
+  )
+
+# View a sample of the resulting data
+head(rent_income_df)
+
+```
+
+**Scaling + Transformation**
+```{r,echo=FALSE}
+library(dplyr)
+
+rent_income_df <- INCOME %>%
+  inner_join(RENT, by = c("GEOID", "NAME", "year")) %>%
+  mutate(
+    # 1. Raw rent-to-income ratio
+    rent_to_income = B25064_001 / B19013_001,
+    
+    # 2. Linear scaling: 0 = min, 100 = max
+    rent_burden_scaled = 100 * (rent_to_income - min(rent_to_income, na.rm = TRUE)) /
+      (max(rent_to_income, na.rm = TRUE) - min(rent_to_income, na.rm = TRUE)),
+    
+    # 3. Standard deviation scaling: how many SDs above the mean
+    rent_burden_sd = (rent_to_income - mean(rent_to_income, na.rm = TRUE)) /
+      sd(rent_to_income, na.rm = TRUE),
+    
+    # 4. Times baseline: relative to mean rent-to-income ratio
+    rent_burden_times_baseline = rent_to_income / mean(rent_to_income, na.rm = TRUE)
+  ) %>%
+  select(GEOID, NAME, year, B25064_001, B19013_001, rent_to_income,
+         rent_burden_scaled, rent_burden_sd, rent_burden_times_baseline)
+
+# View a sample
+head(rent_income_df)
+
+```
+```{r,echo=FALSE}
+library(dplyr)
+library(DT)
+library(ggplot2)
+library(scales)
+
+# Prepare rent burden metric (linear 0-100 scaling)
+rent_income_df <- INCOME %>%
+  inner_join(RENT, by = c("GEOID", "NAME", "year")) %>%
+  mutate(
+    rent_to_income = B25064_001 / B19013_001,
+    rent_burden_scaled = 100 * (rent_to_income - min(rent_to_income, na.rm = TRUE)) /
+      (max(rent_to_income, na.rm = TRUE) - min(rent_to_income, na.rm = TRUE))
+  ) %>%
+  select(GEOID, NAME, year, B25064_001, B19013_001, rent_to_income, rent_burden_scaled)
+
+# -------------------------------
+# Table 1: Trend for a single Metro Area (e.g., New York City)
+nyc_rent_burden <- rent_income_df %>%
+  filter(grepl("New York", NAME)) %>%
+  arrange(year)
+
+datatable(nyc_rent_burden,
+          options = list(pageLength = 10),
+          caption = "Rent Burden Trend in New York City Over Time")
+
+# -------------------------------
+# Table 2: Metro Areas with highest and lowest rent burden in latest year
+latest_year <- max(rent_income_df$year, na.rm = TRUE)
+
+extremes_rent_burden <- rent_income_df %>%
+  filter(year == latest_year) %>%
+  arrange(desc(rent_burden_scaled)) %>%
+  slice(c(1, n()))  # highest and lowest
+
+datatable(extremes_rent_burden,
+          options = list(pageLength = 5),
+          caption = paste("Metro Areas with Highest and Lowest Rent Burden in", latest_year))
+
+# -------------------------------
+# Plot 1: Trend for a single Metro Area (New York City)
+ggplot(nyc_rent_burden, aes(x = year, y = rent_burden_scaled)) +
+  geom_line(color = "blue", size = 1.2) +
+  geom_point(color = "red", size = 2) +
+  scale_y_continuous(labels = scales::percent_format(scale = 1)) +
+  labs(
+    title = "Rent Burden Over Time in New York City",
+    x = "Year",
+    y = "Rent Burden (0-100)",
+    caption = "Metric: Rent-to-Income Ratio Scaled 0-100"
+  ) +
+  theme_bw() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    axis.title = element_text(size = 14),
+    axis.text = element_text(size = 12)
+  )
+
+# -------------------------------
+# Plot 2: Extreme Metro Areas in latest year
+ggplot(extremes_rent_burden, aes(x = reorder(NAME, rent_burden_scaled), y = rent_burden_scaled, fill = NAME)) +
+  geom_col() +
+  scale_y_continuous(labels = scales::percent_format(scale = 1)) +
+  labs(
+    title = paste("Metro Areas with Highest and Lowest Rent Burden in", latest_year),
+    x = "Metro Area",
+    y = "Rent Burden (0-100)",
+    fill = "Metro Area"
+  ) +
+  theme_bw() +
+  theme(
+    plot.title = element_text(size = 16, face = "bold"),
+    axis.title = element_text(size = 14),
+    axis.text = element_text(size = 12),
+    legend.position = "none"
+  )
+
+```
+
+## Housing Growth
+```{r,echo=FALSE}
+# Load required packages
+library(dplyr)
+library(DT)
+library(scales)
+
+# --- Step 1: Prepare and join POPULATION + PERMITS ---
+housing_growth_df <- POPULATION %>%
+  select(GEOID, NAME, year, population = B01003_001) %>%
+  inner_join(
+    PERMITS %>% select(CBSA, year, new_housing_units_permitted),
+    by = c("GEOID" = "CBSA", "year" = "year")
+  ) %>%
+  arrange(GEOID, year)
+
+# --- Step 2: Compute 5-year population growth ---
+housing_growth_df <- housing_growth_df %>%
+  group_by(GEOID) %>%
+  mutate(
+    pop_5yrs_ago = lag(population, n = 5),
+    pop_growth_5yr = (population - pop_5yrs_ago) / pop_5yrs_ago
+  ) %>%
+  ungroup()
+
+# --- Step 3: Instantaneous housing growth (permits per capita) ---
+housing_growth_df <- housing_growth_df %>%
+  mutate(
+    instant_growth = new_housing_units_permitted / population,
+    instant_growth_scaled = rescale(instant_growth, to = c(0, 100))
+  )
+
+# --- Step 4: Rate-based housing growth (permits per population growth) ---
+housing_growth_df <- housing_growth_df %>%
+  mutate(
+    rate_growth = new_housing_units_permitted / (pop_growth_5yr * population),
+    rate_growth = ifelse(is.infinite(rate_growth) | is.na(rate_growth), NA, rate_growth),
+    rate_growth_scaled = rescale(rate_growth, to = c(0, 100), na.rm = TRUE)
+  )
+
+# --- Step 5: Composite score (weighted average) ---
+housing_growth_df <- housing_growth_df %>%
+  mutate(
+    composite_growth = 0.5 * instant_growth_scaled + 0.5 * rate_growth_scaled
+  )
+
+# --- Step 6: Identify top/bottom CBSAs on each metric ---
+top_bottom_instant <- housing_growth_df %>%
+  filter(year == max(year, na.rm = TRUE)) %>%
+  arrange(desc(instant_growth_scaled)) %>%
+  slice(c(1:5, (n()-4):n())) %>%
+  select(NAME, year, instant_growth_scaled)
+
+top_bottom_rate <- housing_growth_df %>%
+  filter(year == max(year, na.rm = TRUE)) %>%
+  arrange(desc(rate_growth_scaled)) %>%
+  slice(c(1:5, (n()-4):n())) %>%
+  select(NAME, year, rate_growth_scaled)
+
+top_bottom_composite <- housing_growth_df %>%
+  filter(year == max(year, na.rm = TRUE)) %>%
+  arrange(desc(composite_growth)) %>%
+  slice(c(1:5, (n()-4):n())) %>%
+  select(NAME, year, composite_growth)
+
+# --- Step 7: Display interactive tables ---
+datatable(top_bottom_instant, caption = "Top and Bottom 5 CBSAs by Instantaneous Housing Growth")
+datatable(top_bottom_rate, caption = "Top and Bottom 5 CBSAs by Rate-Based Housing Growth")
+datatable(top_bottom_composite, caption = "Top and Bottom 5 CBSAs by Composite Housing Growth Index")
+
+# Optional: Save full dataset
+write.csv(housing_growth_df, "housing_growth_metrics.csv", row.names = FALSE)
+
+```
+```{r,echo=FALSE}
+library(dplyr)
+library(ggplot2)
+library(scales)
+
+# Combine Rent Burden and Housing Growth into a single dataframe
+rent_growth_combined <- rent_income_df %>%
+  select(GEOID, NAME, year, rent_burden_scaled) %>%
+  left_join(
+    housing_growth_df %>%
+      select(GEOID, year, composite_growth),
+    by = c("GEOID", "year")
+  )
+
+# Check combined data
+head(rent_growth_combined)
+
+# 1. Scatter plot over time to visualize Rent Burden vs. Housing Growth
+ggplot(rent_growth_combined, aes(x = rent_burden_scaled, y = composite_growth, color = year)) +
+  geom_point(alpha = 0.7, size = 3) +
+  scale_color_gradient(low = "blue", high = "red") +
+  labs(
+    x = "Rent Burden (Scaled)",
+    y = "Housing Growth (Composite Score)",
+    color = "Year",
+    title = "Rent Burden vs. Housing Growth Across CBSAs Over Time"
+  ) +
+  theme_bw(base_size = 14)
+
+# 2. Highlight "YIMBY" CBSAs: high early rent burden, decreasing over time, strong housing growth
+# Compute early and late rent burden
+yimby_candidates <- rent_growth_combined %>%
+  group_by(GEOID, NAME) %>%
+  summarize(
+    early_rent = first(rent_burden_scaled),
+    latest_rent = last(rent_burden_scaled),
+    avg_growth = mean(composite_growth),
+    .groups = "drop"
+  ) %>%
+  filter(early_rent > median(rent_growth_combined$rent_burden_scaled),
+         latest_rent < early_rent,
+         avg_growth > median(rent_growth_combined$composite_growth))
+
+# Spaghetti plot: all CBSAs in gray, YIMBY highlighted
+ggplot(rent_growth_combined, aes(x = year, y = rent_burden_scaled, group = NAME)) +
+  geom_line(color = "grey80", alpha = 0.5) +
+  geom_line(data = filter(rent_growth_combined, GEOID %in% yimby_candidates$GEOID),
+            aes(color = NAME), size = 1.2) +
+  labs(
+    x = "Year",
+    y = "Rent Burden (Scaled)",
+    color = "YIMBY CBSAs",
+    title = "Evolution of Rent Burden Over Time with Highlighted YIMBY Cities"
+  ) +
+  theme_bw(base_size = 14)
+
+```
+## Policy Brief
+To promote affordable housing nationwide, Congress should establish a federal program encouraging municipalities to adopt YIMBY-friendly policies. A primary sponsor from New York City, NY, which has decreasing rent burden, strong housing growth, and a high concentration of young adults in creative and tech occupations, alongside a co-sponsor from San Francisco, CA, which has high rents, slow housing development, and comparatively fewer young households, would provide a compelling contrast. Key metrics supporting this initiative include a rent burden metric, which measures the share of income spent on rent over time, and a housing growth metric, which assesses new housing permits relative to population and population growth over a five-year window. These metrics objectively identify cities with successful YIMBY policies and those needing federal support. Mobilizing support from healthcare professionals, tech/finance workers, and young adult creative professionals, who represent significant employment in these cities, strengthens the bill’s political feasibility, as reducing rent burden benefits these groups by increasing disposable income and improving living conditions. Prioritizing cities that combine high early rent burden, decreasing trends, population growth, above-average housing growth, and strong millennial presence ensures federal resources have maximum impact while providing a clear framework for targeting and evaluating policy success.
+
+## Conclusion
+Our analysis highlights the significant variation in housing affordability across U.S. metro areas. Cities like New York City show trends of decreasing or stabilizing rent burden over time, reflecting relative success in expanding housing supply and supporting residents’ income needs. In contrast, other metros experience extremely high or growing rent burdens, signaling that housing supply has not kept pace with demand and residents face financial strain.
+
+By combining rent, income, and household data into a rent burden metric, and comparing across years and metro areas, we can identify regions that are successfully managing housing affordability and those that need intervention. This approach provides a clear framework for policymakers: supporting metros with high rent burdens and constrained housing growth can help alleviate financial pressure, improve access to housing, and foster more equitable urban development.
+
+Ultimately, tracking these metrics over time allows for targeted strategies that prioritize cities where housing is most unaffordable, while learning from areas that have been able to expand supply effectively. This ensures that policy efforts have maximum impact in improving living conditions and economic mobility for residents across the country.
+ 

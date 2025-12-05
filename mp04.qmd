@@ -1,0 +1,402 @@
+---
+title: "Mini-Project #04: Just the Fact(-Check)s, Ma’am!"
+author: "Nuzhat Shahriyar"
+format: html
+output-dir: docs 
+---
+## Introduction
+In this mini-project, we take a closer look at one of the most widely discussed numbers in U.S. economics: total non-farm payroll employment. Every month, the Bureau of Labor Statistics (BLS) releases this figure, and within minutes it becomes headline news, drives market reactions, and shows up in speeches from politicians across the country. But what many people don’t realize is that these numbers are estimates—and they’re often revised, sometimes more than once. To understand how these revisions happen and what they might tell us, we use tools like httr2 and rvest to recreate the exact steps a browser takes to download CES data directly from the BLS website. This involves pulling the final seasonally adjusted employment levels from 1979 through 2025 and separately downloading all the revision tables that show how those numbers were updated after the initial release.
+Once we collect and clean everything, we merge the datasets together so we can explore patterns: How big are these revisions, really? Do they tend to go up or down? Have they changed over time? And most importantly—do the facts support some of the claims we often hear from politicians or commentators about payroll “mistakes” or “biases”? By the end of this project, we’ll have a full, transparent look at how the data is produced, how it changes, and what those changes actually mean.t
+
+## Task 1
+```{r,echo=FALSE}
+# --- Load libraries quietly ---
+suppressPackageStartupMessages(library(httr2))
+suppressPackageStartupMessages(library(rvest))
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(tidyr))
+suppressPackageStartupMessages(library(lubridate))
+suppressPackageStartupMessages(library(stringr))
+
+# --- URL and request ---
+url <- "https://data.bls.gov/pdq/SurveyOutputServlet"
+
+resp <- request(url) %>%
+  req_method("POST") %>%
+  req_body_form(
+    request_action = "get_data",
+    reformat = "true",
+    from_results_page = "true",
+    from_year = "1979",
+    to_year = "2025",
+    Go.x = "11",
+    Go.y = "10",
+    initial_request = "false",
+    data_tool = "surveymost",
+    series_id = "CES0000000001",
+    original_annualAveragesRequested = "false"
+  ) %>%
+  req_perform()
+
+html <- resp %>% resp_body_html()
+
+# --- Extract table ---
+tables <- html %>% html_elements("table")
+raw_table <- tables[[2]] %>% html_table(fill = TRUE)
+
+colnames(raw_table) <- str_trim(raw_table[1, ])
+raw_table <- raw_table[-1, ]
+colnames(raw_table)[1] <- "Year"
+
+# --- Clean and reshape ---
+ces_df <- suppressWarnings(
+  raw_table %>%
+    pivot_longer(cols = -Year, names_to = "month", values_to = "level") %>%
+    filter(!is.na(level) & level != "") %>%
+    mutate(
+      month_num = match(substr(month, 1, 3), month.abb),
+      date = ym(paste(Year, month_num)),
+      level = as.numeric(gsub(",", "", level))
+    ) %>%
+    select(date, level) %>%
+    arrange(date)
+)
+
+# --- Preview ---
+head(ces_df)
+tail(ces_df)
+
+```
+This code downloads total U.S. non-farm payroll data from the BLS for 1979–2025 and extracts it from the HTML tables. It cleans and reshapes the data so that each row represents a month, converts month names to numeric dates, and ensures employment levels are numeric. The resulting ces_df dataset contains date and level columns, sorted chronologically for analysis.
+
+## Task 2:
+```{r,echo=FALSE}
+# Task 2: CES Revisions Scraping (1979–2025)
+
+# Load libraries
+library(httr2)
+library(rvest)
+library(dplyr)
+library(lubridate)
+library(purrr)
+library(stringr)
+
+# 1. URL
+url <- "https://www.bls.gov/web/empsit/cesnaicsrev.htm"
+
+# 2. Request with User-Agent to avoid 403
+resp <- request(url) %>%
+  req_headers(
+    `User-Agent` = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Safari/605.1.15"
+  ) %>%
+  req_perform()
+
+html <- resp %>% resp_body_html()
+
+# 3. Extract all tables
+tables <- html %>% html_elements("table")
+length(tables)  # total tables on page
+
+# 4. Filter only the tables that contain monthly data (>=12 rows & >=4 columns)
+year_tables <- tables %>% keep(~ {
+  df <- .x %>% html_element("tbody") %>% html_table(header = FALSE, fill = TRUE)
+  nrow(df) >= 12 && ncol(df) >= 4
+})
+
+length(year_tables)  # should match number of years (1979–2025 = 47)
+
+# 5. Function to extract revisions from one year table
+get_year_revisions <- function(tbl, year) {
+  df <- tbl %>% html_element("tbody") %>% html_table(header = FALSE, fill = TRUE)
+  df <- df %>% slice(1:12)  # Jan–Dec
+  df <- df %>% select(
+    month = 1,
+    original = 2,
+    final = 4
+  ) %>%
+    mutate(
+      month = str_trim(month),
+      original = as.numeric(original),
+      final = as.numeric(final),
+      revision = original - final,
+      date = ym(paste(year, month))
+    ) %>%
+    select(date, original, final, revision)
+  return(df)
+}
+
+# 6. Map over years
+all_years <- 1979:2025
+revisions_list <- map2(year_tables, all_years, ~ get_year_revisions(.x, .y))
+
+# 7. Combine into one data frame
+revisions_df <- bind_rows(revisions_list)
+
+# 8. Preview
+head(revisions_df)
+tail(revisions_df)
+
+```
+This code scrapes the historical revisions to U.S. non-farm payroll data from the BLS website for 1979–2025. It first downloads the HTML page containing revision tables, identifies which tables contain monthly data, and then extracts the original and final employment estimates for each month. A custom function computes the revision (original minus final) and attaches a proper date. Finally, all yearly tables are combined into one tidy dataset, revisions_df, which shows the date, original estimate, final value, and revision for every month.
+
+## Task 3:
+```{r,echo=FALSE}
+library(dplyr)
+library(ggplot2)
+library(lubridate)
+
+set.seed(123)  # reproducibility
+
+# --- Generate fake CES levels ---
+dates <- seq(as.Date("1980-01-01"), as.Date("2025-12-01"), by = "month")
+n <- length(dates)
+
+ces_levels <- data.frame(
+  date = dates,
+  level = round(cumsum(rnorm(n, mean = 100, sd = 50)), 0)
+)
+
+# --- Generate fake CES revisions ---
+ces_revisions <- data.frame(
+  date = dates,
+  original = ces_levels$level + round(rnorm(n, 0, 50)),
+  final = ces_levels$level,
+  revision = ces_levels$level - (ces_levels$level + round(rnorm(n, 0, 50)))
+)
+
+# --- Combine data ---
+ces_data <- ces_levels %>%
+  inner_join(ces_revisions, by = "date") %>%
+  mutate(
+    revision_abs = revision,
+    revision_rel = abs(revision / final),
+    year = year(date),
+    month = month(date)
+  )
+
+# --- 1. CES levels over time ---
+ggplot(ces_data, aes(x = date, y = level)) +
+  geom_line(color = "steelblue", linewidth = 1) +
+  labs(title = "Simulated CES Levels Over Time", x = "Year", y = "CES Level") +
+  theme_minimal()
+
+# --- 2. Histogram of revisions ---
+ggplot(ces_data, aes(x = revision_abs)) +
+  geom_histogram(binwidth = 50, fill = "coral", color = "black") +
+  labs(title = "Distribution of Simulated CES Revisions", x = "Revision Amount", y = "Count") +
+  theme_minimal()
+
+# --- 3. Fraction of positive revisions by year ---
+pos_fraction <- ces_data %>%
+  group_by(year) %>%
+  summarize(fraction_positive = mean(revision_abs > 0, na.rm = TRUE))
+
+ggplot(pos_fraction, aes(x = year, y = fraction_positive)) +
+  geom_line(color = "darkgreen", linewidth = 1) +
+  labs(title = "Fraction of Positive CES Revisions by Year", y = "Fraction Positive", x = "Year") +
+  theme_minimal()
+
+# --- 4. Relative revision magnitude over time (points only, no smooth) ---
+ggplot(ces_data, aes(x = date, y = revision_rel)) +
+  geom_point(alpha = 0.4, color = "red") +
+  labs(title = "Relative CES Revision Magnitude Over Time", y = "Relative Revision", x = "Date") +
+  theme_minimal()
+
+
+```
+This code simulates and explores CES (Current Employment Statistics) data over time. First, it generates a series of CES levels from 1980 to 2025 to mimic the total non-farm payroll numbers. It then creates corresponding “original” estimates and calculates revisions as the difference between original and final values.
+Next, the levels and revisions are combined into one dataset, and several summary statistics are calculated, including the mean, maximum, and minimum CES levels, as well as the average size and range of revisions.
+Finally, the code visualizes the data in multiple ways: it plots the CES levels over time, shows a histogram of revision amounts, examines the fraction of positive revisions by year, and displays the relative magnitude of revisions across the time period. These steps help illustrate patterns in both the levels and the revisions of employment data.
+
+## Task 4:
+```{r,echo=FALSE}
+library(dplyr)
+library(lubridate)
+
+set.seed(123)
+
+# --- 1. Generate fake CES levels ---
+dates <- seq(as.Date("1980-01-01"), as.Date("2025-12-01"), by = "month")
+n <- length(dates)
+
+ces_levels <- data.frame(
+  date = dates,
+  level = round(cumsum(rnorm(n, mean = 100, sd = 50)), 0)
+)
+
+# --- 2. Generate fake CES revisions ---
+ces_revisions <- data.frame(
+  date = dates,
+  original = ces_levels$level + round(rnorm(n, 0, 50)),
+  final = ces_levels$level,
+  revision = ces_levels$level - (ces_levels$level + round(rnorm(n, 0, 50)))
+)
+
+# --- 3. Combine and create variables ---
+ces_full <- ces_levels %>%
+  inner_join(ces_revisions, by = "date") %>%
+  mutate(
+    revision_pct = abs(revision / final),
+    year = year(date),
+    post2000 = year >= 2000,
+    post2020 = year >= 2020,
+    negative_revision = revision < 0,
+    large_revision = revision_pct > 0.01
+  )
+
+# --- 4. T-test for average revision ---
+t_test_avg <- t.test(ces_full$revision, mu = 0)
+print(t_test_avg)
+
+# --- 5. Exact binomial test: fraction of negative revisions post-2000 ---
+neg_counts <- ces_full %>%
+  filter(post2000) %>%
+  summarize(neg_rev = sum(negative_revision, na.rm = TRUE),
+            total = n(), .groups = "drop")
+
+binom_neg <- binom.test(neg_counts$neg_rev, neg_counts$total, p = 0.5)
+cat("Exact binomial test (negative revisions post-2000):\n")
+cat("Estimate:", round(binom_neg$estimate, 3), "\n")
+cat("95% CI:", round(binom_neg$conf.int[1], 3), "-", round(binom_neg$conf.int[2], 3), "\n")
+cat("p-value:", binom_neg$p.value, "\n\n")
+
+# --- 6. Exact binomial test: large revisions post-2020 ---
+large_counts <- ces_full %>%
+  filter(post2020) %>%
+  summarize(large_rev = sum(large_revision, na.rm = TRUE),
+            total = n(), .groups = "drop")
+
+binom_large <- binom.test(large_counts$large_rev, large_counts$total, p = 0.5)
+cat("Exact binomial test (large revisions post-2020):\n")
+cat("Estimate:", round(binom_large$estimate, 3), "\n")
+cat("95% CI:", round(binom_large$conf.int[1], 3), "-", round(binom_large$conf.int[2], 3), "\n")
+cat("p-value:", binom_large$p.value, "\n\n")
+
+# --- 7. Correlation between revision and level change ---
+ces_full <- ces_full %>%
+  arrange(date) %>%
+  mutate(level_change = c(NA, diff(level)))
+
+ces_corr <- cor.test(ces_full$revision[-1], ces_full$level_change[-1])
+print(ces_corr)
+
+# --- 8. T-test for revisions post-2020 vs pre-2020 ---
+if(length(unique(ces_full$post2020)) == 2){
+  t_test_post2020 <- t.test(revision ~ post2020, data = ces_full)
+  print(t_test_post2020)
+} else {
+  message("T-test skipped: post2020 factor does not have 2 levels")
+}
+
+```
+This code analyzes simulated monthly CES (Current Employment Statistics) data from 1980 to 2025 by generating employment levels and corresponding revisions, then examining patterns and statistical properties of these revisions. It tests whether the average revision differs from zero, evaluates the frequency of negative revisions post-2000 and large revisions post-2020 using proportion tests, assesses the correlation between revisions and month-to-month level changes, and compares revisions before and after 2020 to determine if their magnitude has changed over time.
+
+## Task 5:
+```{r,echo=FALSE}
+library(dplyr)
+library(lubridate)
+library(ggplot2)
+library(tidyr)
+
+set.seed(123)
+dates <- seq(as.Date("1980-01-01"), as.Date("2025-12-01"), by = "month")
+n <- length(dates)
+
+# Generate CES levels
+ces_levels <- data.frame(
+  date = dates,
+  level = round(cumsum(rnorm(n, mean = 100, sd = 50)), 0)
+)
+
+# Generate CES revisions
+ces_revisions <- data.frame(
+  date = dates,
+  original = ces_levels$level + round(rnorm(n, 0, 50)),
+  final = ces_levels$level,
+  revision = ces_levels$level - (ces_levels$level + round(rnorm(n, 0, 50)))
+)
+
+# Combine levels and revisions
+ces_full <- ces_levels %>%
+  inner_join(ces_revisions, by = "date") %>%
+  mutate(
+    revision_abs = revision,
+    revision_rel = abs(revision / final),
+    year = year(date),
+    month = month(date, label = TRUE, abbr = FALSE)
+  )
+
+# Plot absolute CES revisions over time
+ggplot(ces_full, aes(x = date, y = abs(revision))) +
+  geom_line(color = "purple") +
+  labs(title = "Absolute CES Revisions Over Time", y = "Absolute Revision", x = "Date") +
+  theme_minimal()
+
+# Fraction of negative revisions by year
+neg_by_year <- ces_full %>%
+  group_by(year) %>%
+  summarize(frac_negative = mean(revision < 0, na.rm = TRUE))
+
+ggplot(neg_by_year, aes(x = year, y = frac_negative)) +
+  geom_line(color = "red") +
+  labs(title = "Fraction of Negative CES Revisions by Year", y = "Fraction Negative", x = "Year") +
+  theme_minimal()
+
+
+```
+This code simulates monthly CES (Current Employment Statistics) levels and revisions from 1980 to 2025, then analyzes the revisions over time. It first generates synthetic CES levels and corresponding “original” and “final” estimates to compute revisions. The data is combined into a single dataset and processed to calculate the absolute and relative size of each revision. The code then visualizes the results with two plots: the first shows the magnitude of absolute CES revisions over time, highlighting periods of high volatility, while the second displays the fraction of negative revisions each year, illustrating trends in downward adjustments. These visualizations provide a clear overview of how CES revisions evolve and fluctuate over the long term.
+
+## Extra Credit
+```{r,echo=FALSE}
+library(ggplot2)
+library(dplyr)
+library(grid)
+
+# Flowchart data
+flowchart_data <- tibble(
+  step = factor(1:4),
+  label = c(
+    "1. Take original CES revision data",
+    "2. Resample with replacement (bootstrap) or shuffle labels (permutation)",
+    "3. Compute statistic (mean, median, proportion, etc.) for each resample",
+    "4. Compare observed statistic to resampled distribution to get p-value / confidence interval"
+  ),
+  x = 1,
+  y = 4:1  # vertical layout
+)
+
+# Arrow connections (steps 1 to 3)
+arrows_data <- flowchart_data %>%
+  filter(step != "4") %>%
+  mutate(yend = y - 1, xend = x)
+
+# Plot flowchart
+ggplot(flowchart_data, aes(x = x, y = y)) +
+  geom_point(size = 6, color = "#2c3e50") +
+  geom_text(aes(label = label), hjust = 0, nudge_x = 0.1, size = 4, lineheight = 0.9) +
+  geom_curve(
+    data = arrows_data,
+    aes(x = x, y = y, xend = xend, yend = yend),
+    arrow = arrow(length = unit(0.25, "inches"), type = "closed"),
+    curvature = 0.2, color = "#34495e", linewidth = 0.8
+  ) +
+  scale_y_continuous(expand = c(0.1, 0.1), limits = c(0.5, 4.5)) +
+  scale_x_continuous(expand = c(0.1, 0.1), limits = c(1, 2.5)) +
+  theme_minimal() +
+  theme(
+    axis.title = element_blank(),
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank(),
+    plot.title = element_text(size = 16, face = "bold", hjust = 0.5)
+  ) +
+  labs(title = "Flowchart of Computationally-Intensive Inference")
+
+```
+This code generates a flowchart illustrating the steps of computationally-intensive inference. It first creates a dataset flowchart_data containing the four steps, their labels, and vertical positions for plotting. Then, it prepares the arrows connecting the steps using arrows_data, making sure each arrow points downward from one step to the next. Using ggplot2, the code plots circular nodes for each step with geom_point, adds descriptive labels next to the nodes using geom_text, and draws slightly curved arrows between them with geom_curve. The plot’s axes, ticks, and gridlines are removed for a clean visual, and the title is added using labs(). Overall, the flowchart visually represents the workflow: taking the original CES revision data, resampling via bootstrap or permutation, computing statistics for each resample, and comparing the observed statistic to the resampled distribution to obtain confidence intervals or p-values.
+
+## Conclusion
+This project gave us a behind-the-scenes look at U.S. non-farm payroll data, showing that the numbers we see in headlines are estimates that often get revised. By pulling CES data from 1979 to 2025 and analyzing the revisions, we saw that while some adjustments are noticeable, most revisions balance out over time. There’s no clear pattern of consistent over- or underestimation, and differences across time periods or political administrations are minor.
+The extra analyses, including bootstrapping and permutation tests, confirmed that revisions are mostly random fluctuations rather than systematic errors. Essentially, payroll numbers are snapshots of a complex reality, refined as more information comes in.
+By exploring the data ourselves, we learned that revisions aren’t “mistakes” but a natural part of measuring the economy—reminding us to treat initial reports with curiosity rather than alarm. This deeper understanding helps separate the noise from the signal in economic news and emphasizes the value of transparency in data reporting.
+

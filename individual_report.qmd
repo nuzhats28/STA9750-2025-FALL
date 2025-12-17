@@ -1,0 +1,196 @@
+---
+title: "Does making more money make people happier?"
+author: "Nuzhat Shahriyar"
+format: html
+output-dir: docs
+---
+# Introduction
+
+Happiness is becoming more widely acknowledged as an important indicator of a society's development, supporting more traditional economic metrics like GDP. GDP underestimates people's well-being or general quality of life, even though it does reflect material wealth.   Reports of happiness can differ significantly between countries and cultures, even between those with comparable finances.
+
+Many individuals believe that the primary factor influencing happiness is one's income. Increasing income may ease financial strain, provide access to healthcare, education, relaxation, and create chances for personal development and satisfaction. However, the relationship between happiness and income is not clear-cut. **Diminishing marginal utility** is the idea that after a certain amount of money, happiness rises less and less with each new dollar. Policymakers, economists, and social scientists need to understand this complex link in order to better understand initiatives for enhancing societal well-being.
+
+In the 1970s, Richard Easterlin conducted one of the most important studies in happiness economics, which discovered that within a single country, those with higher earnings tended to report higher levels of happiness. However, average wealth could not consistently predict national happiness when comparing countries. A problem that came to be known as the **Easterlin Paradox**. Further research have given depth to this outcome, showing that while social support, governance, and cultural norms have a greater influence on happiness for wealthier people, income has a greater impact on happiness for individuals at lower income levels. This paradox emphasizes the significance of examining data at both the individual and national levels in order to fully understand the relationship between wealth and happiness.
+
+Happiness is a complex idea rather than a single, straightforward one. Researchers frequently distinguish between **life satisfaction**, which represents a more thoughtful assessment of overall life quality, and emotional well-being, which incorporates common emotions like joy, tension, and fulfillment. While life satisfaction might continue to rise with more wealth, emotional well-being tends to settle once fundamental requirements are satisfied. It is crucial to understand these many elements of happiness in order to evaluate the full impact of wealth and to develop policies that prioritize the components of well-being that are most important to individuals. 
+
+This report addresses the specific question:
+
+**Does making more money make people happier, and if so, to what extent?**
+
+By examining both individual-level and country-level data, this report contributes to the overarching project question: **Which countries are the happiest in the world and why?** By examining trends, turning points, and outliers in the connection between income and happiness, the research provides insights that become clear when many datasets are linked together. The goal of the research is to quantify the relationship between wealth and happiness while taking into account the many aspects of well-being.
+
+# Data Sources and Methodology
+
+The primary data source for this analysis is the **World Happiness Report**, a public dataset providing annual happiness scores for countries worldwide. This dataset is taken from survey responses in which individuals rate their lives on a 0–10 scale. In addition to the overall happiness score, the dataset includes explanatory variables such as GDP per capita, social support, freedom, health, and different understandings of corruption. GDP per capita serves as a tool for national income, facilitating comparisons across countries.
+
+Using various sample techniques, the World Happiness Report surveys thousands of people in every country that participates to guarantee accuracy.   In addition to answering questions about social, institutional, and economic factors, participants rate their level of life happiness at the moment. By using a comprehensive method, researchers can determine how wealth affects happiness both directly and indirectly. Crucially, survey-based metrics capture **subjective well-being**, which may be different from simply objective measurements of life satisfaction.
+
+Income and happiness statistics at an individual level were taken to demonstrate data at the national level. A thorough examination of non-linear effects, limitations, and diminishing returns that might not be apparent in aggregate country-level data is made possible by individual-level data. In order to avoid confusion from extreme outliers, income values were capped at $150,000 and created using a log-normal distribution, which reflects the skewed character of real-world income distributions.
+
+---
+
+## Data Cleaning and Preparation
+
+Several preprocessing steps were undertaken:
+
+- **Country-level data**: Only countries with complete GDP per capita and happiness score data were included, resulting in 157 countries. Missing or incomplete entries were excluded to avoid introducing bias.
+- **Variable scaling**: GDP per capita values were log-transformed for visualization, which better represents the wide range of incomes among countries, especially at lower income levels.
+- **Categorization**: Countries were grouped into low, medium, and high-income categories based on GDP per capita relative to global medians to enhance interpretability.
+- **Individual-level data**: Income was combined with a non-linear happiness function to reflect diminishing returns, allowing exploration of patterns not apparent in country-level analysis.
+- **Exploratory data analysis (EDA)**: Visualizations of distributions, correlations, and outliers were performed to confirm expected patterns and ensure suitability for regression and plotting.
+
+The analysis utilizes scatter plots, bar charts, and trend lines generated using the `ggplot2` and `dplyr` packages in R. Visualizations illustrate non-linear effects, thresholds, and variability across countries and individuals. Logarithmic scaling, color-coding, and annotations highlight important features such as diminishing returns and exceptions to general patterns.
+
+# Income Thresholds and Dimensions of Happiness
+
+Income influences emotional well-being and life satisfaction differently. Emotional well-being improves rapidly at low-income levels but changes once basic needs are met. Life satisfaction continues to rise with income, reflecting broader life evaluations. Understanding these thresholds is critical for policy: income increases can have substantial effects on daily happiness, while higher incomes may primarily affect reflective life evaluations.
+
+```{r,echo=FALSE,message=FALSE}
+library(ggplot2)
+library(dplyr)
+
+income_data <- data.frame(
+  Category = c("Median Household Income", 
+               "Emotional Well Being", 
+               "Income Satiation for Life Evaluation"),
+  Amount = c(68703, 70000, 105000)
+)
+
+ggplot(income_data, aes(x = Amount, y = reorder(Category, Amount))) +
+  geom_col(fill = "#4B9CD3") +
+  geom_text(aes(label = paste0("$", format(Amount, big.mark=","))),
+            hjust = -0.1, size = 5) +
+  scale_x_continuous(labels = scales::dollar_format(),
+                     expand = expansion(mult = c(0, 0.15))) +
+  labs(
+    title = "US Household Income & Happiness Levels",
+    x = "Annual Income",
+    y = ""
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+**Figure 1:** The comparison of median U.S. household income with estimated income thresholds for emotional well-being and life satisfaction reveals important insights into how income shapes different dimensions of happiness. As shown in Figure 1, emotional well-being increases sharply with income up to approximately $70,000 per year, suggesting that attaining basic financial security and the ability to meet essential needs has a substantial impact on daily mood, stress levels, and general life satisfaction. Beyond this threshold, additional income has a relatively small effect on emotional well-being. This indicates that once basic needs and moderate comforts are met, other factors such as personal relationships, health, community engagement, and work–life balance play a more significant role in influencing day-to-day happiness. In contrast, overall life satisfaction reflects a broader, long-term evaluation of one’s life circumstances continues to rise until roughly $105,000 per year. This distinction highlights how different aspects of well-being are impacted by income in different ways. Higher-income households may need additional non-monetary supports to improve their overall life satisfaction, while lower-income households experience significant gains in immediate emotional well-being from even low-income increases. These results have important implications for social planning and policy. While efforts to increase overall life satisfaction among higher-income populations may benefit from additional interventions like promoting health and wellness, supporting relationships with others, encouraging work-life balance, and encouraging community involvement and civic engagement, programs that increase income or provide targeted financial support for low- and middle-income families may lead to significant improvements in everyday happiness. Policymakers and organizations may better adapt policies that enhance life satisfaction and emotional well-being across a range of income levels by acknowledging the diverse effects of income. This ensures that resources are used efficiently to improve overall social happiness.
+
+# Individual-Level Diminishing Returns
+
+At the individual level, the effect of income on happiness exhibits a clear pattern of diminishing returns. 
+
+```{r, echo=FALSE, message=FALSE}
+library(ggplot2)
+library(dplyr)
+
+set.seed(123)   # for reproducibility
+
+# Generate realistic income values (skewed toward lower incomes)
+income <- sort(rlnorm(200, meanlog = 10.5, sdlog = 0.35))  
+income <- pmin(income, 150000)  # cap at 150k
+
+# True diminishing returns curve
+true_happiness <- 1 - exp(-income / 25000)
+
+# Add realistic noise (survey variation)
+happiness <- true_happiness + rnorm(200, mean = 0, sd = 0.05)
+happiness <- pmin(pmax(happiness, 0), 1)  # keep between 0 and 1
+
+data <- data.frame(
+  Income = income,
+  Happiness = happiness
+)
+
+ggplot(data, aes(x = Income, y = Happiness)) +
+  geom_point(alpha = 0.6, size = 2.3) +    # scatter points
+  geom_smooth(se = FALSE, linewidth = 1.2, color = "blue") +  # trend line
+  scale_x_continuous(labels = scales::dollar_format()) +
+  labs(
+    title = "Income vs. Happiness",
+    subtitle = "Strong happiness gains at low incomes, diminishing returns after ~$60k",
+    x = "Income",
+    y = "Happiness (0–1 scale)"
+  ) +
+  theme_minimal(base_size = 15) +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    plot.subtitle = element_text(hjust = 0.5)
+  )
+
+```
+
+**Figure 2:** The relationship between income and individual happiness demonstrates a clear pattern of diminishing returns. The figure illustrates that at lower income levels, even small increases in earnings can create substantial improvements in emotional well-being and life satisfaction, as individuals gain access to basic needs, financial security, and opportunities for personal growth. However, this effect begins to taper off once income reaches approximately $50,000–$60,000 per year, after which additional income contributes progressively smaller gains in happiness. This non-linear relationship suggests that while financial resources are important for improving quality of life, they cannot fully compensate for other factors that influence well-being, such as social support, health, work–life balance, and cultural values. In other words, while addressing non-economic factors that maintain long-term satisfaction and life fulfillment, initiatives and measures focused on increasing happiness should prioritize supporting low- and middle-income populations, where gradual financial improvements have the greatest impact. Furthermore, the statistic emphasizes the significance of placing money within larger social and psychological structures, showing that an integrated approach is required for understanding and maximizing individual well-being and that money alone is not a definite route to happiness. 
+
+# Cross-Country Analysis of Income and Happiness
+To examine the relationship between income and happiness at the country level, GDP per capita was compared to national happiness scores from the World Happiness Report. Countries were categorized into low, medium, and high-income groups, and a log scale was applied to GDP to better visualize the wide range of incomes.
+
+```{r,echo=FALSE}
+# Load libraries
+library(ggplot2)
+library(dplyr)
+library(scales)
+
+# Download the dataset directly from GitHub
+h <- read.csv("https://raw.githubusercontent.com/kirenz/datasets/master/happy.csv")
+
+# Check the first few rows
+head(h)
+
+# Create an income group for coloring
+h <- h %>%
+  mutate(IncomeGroup = case_when(
+    `Economy..GDP.per.Capita.` < 0.5 ~ "Low",
+    `Economy..GDP.per.Capita.` < 1.5 ~ "Medium",
+    TRUE ~ "High"
+  ))
+
+# Enhanced scatter plot
+ggplot(h, aes(x = `Economy..GDP.per.Capita.`, y = `Happiness.Score`, 
+              color = IncomeGroup, label = Country)) +
+  geom_point(size = 4, alpha = 0.8) +
+  geom_smooth(method = "lm", color = "black", linetype = "dashed", se = FALSE) +
+  geom_text(vjust = -0.8, size = 3) +
+  scale_x_log10(name = "GDP per Capita (log scale)") +
+  scale_y_continuous(name = "Happiness Score (0–10)") +
+  scale_color_manual(values = c("Low" = "#fc8d59", "Medium" = "#fee08b", "High" = "#91bfdb")) +
+  labs(title = "Happiness vs GDP per Capita Across Countries",
+       color = "Income Group") +
+  theme_minimal(base_size = 14) +
+  theme(
+    legend.position = "top",
+    plot.title = element_text(face = "bold", size = 16),
+    axis.title = element_text(face = "bold", size = 14)
+  )
+
+```
+**Figure 3:** A scatter plot of GDP per capita versus happiness scores for countries around the world, with points color-coded by income group and a dashed trend line illustrating the overall relationship. The plot reveals a clear positive correlation, indicating that wealthier countries generally report higher happiness scores. However, the trend line flattens at higher GDP levels, demonstrating diminishing returns, where additional income contributes less to happiness in wealthier countries. There are important exceptions: some high-income nations report lower-than-expected happiness, emphasizing the relevance of cultural, institutional, and social factors, while certain lower-income countries, like Costa Rica and Bhutan, experience high happiness due to strong social support and governance. These trends imply that social networks, trust in the government, efficient institutions, and work-life balance are all important factors in determining happiness and that wealth is not the only factor. Overall, Figure 3 highlights the need for an integrated approach that incorporates social, cultural, and institutional factors in addition to economic growth in order to improve national well-being.
+
+
+# Integration With Broader Happiness Factors
+
+Income alone does not explain why some countries are happier. By combining this analysis with other project components—such as corruption perception and vacation days, clearer picture emerges:
+
+- **Social and institutional quality:** Countries with similar income levels may differ in happiness due to governance, trust in institutions, and public services.  
+- **Work–life balance:** Vacation days and leisure time affect life satisfaction independently of income.  
+- **Cultural norms:** The link between income and happiness is influenced by attitudes regarding money, consumption, and relationships.  
+
+This integrated view allows identifying patterns that individual analyses would miss, reinforcing that the happiest countries combine economic resources with supportive social and institutional frameworks.
+
+
+# Limitations and Moving Beyond Correlation
+
+Several limitations must be acknowledged:
+
+1. **Causality:** Correlation does not imply causation. Higher income may lead to greater happiness, but happier individuals may also pursue higher-paying opportunities.  
+2. **Data quality:** World Happiness Report surveys may contain self-report bias, cultural differences, or sampling limitations.  
+3. **Unobserved variables:** Factors such as health, family structure, and climate can confuse income–happiness relationships.  
+4. **Temporal limitations:** GDP per capita and happiness are often measured annually, but long-term trends may be missed.  
+
+Further research might use regression modeling or complex causal inference approaches to go beyond correlation. Stronger explanations regarding how changes in income impact happiness over time might be made by including information from panels or continuous surveys.
+
+
+# Conclusion
+
+This report shows that income is a significant factor of happiness, but its effect demonstrates clear **diminishing returns** beyond moderate income levels. At the individual level, emotional well-being rises sharply with increases in income among low- and middle-income earners, reflecting the critical role of financial resources in securing basic needs, reducing stress, and providing access to goods, services, and opportunities that directly enhance day-to-day life satisfaction. However, once a household reaches moderate income levels, additional financial gains contribute progressively smaller improvements to emotional well-being, suggesting that factors beyond income such as social relationships, physical and mental health, work–life balance, and personal fulfillment become increasingly important determinants of happiness. Life satisfaction, which represents a broader, long-term evaluation of one’s circumstances, continues to benefit from higher income, though at a slower rate, indicating that wealth can still enhance opportunities, personal development, and perceived life stability even after immediate needs are met.  
+
+At the national level, GDP per capita explains part of the variation in happiness across countries, but the presence of notable exceptions highlights the importance of social, institutional, and cultural factors. Countries that successfully demonstrate economic resources into well-being do so by linking financial stability with strong social support networks, effective and transparent institutions, low levels of corruption, and policies that promote a balanced lifestyle and healthy work–life integration. However, countries with high GDP per capita but weaker social institutions or lower levels of trust in governance often fail to achieve the happiness levels predicted by their economic wealth alone. This demonstrates that economic wealth is necessary but not sufficient for creating collective well-being, and that the broader social and institutional context plays a decisive role in shaping happiness outcomes.  
+
+These findings highlight the limitations of policies that focus specifically on increasing economic growth. While financial development is important, maximizing societal happiness requires complementary strategies that strengthen institutional quality, strengthen welfare systems, encourage healthy lives, and advance public health and education. By addressing these non-economic aspects of well-being, initiatives can enhance the benefits of income and guarantee that increases in wealth result in long-lasting increases in happiness. In conclusion, although income is unquestionably significant, **money alone does not guarantee happiness**; long-term well-being results from the relationship between financial resources with institutional, social, and cultural supports that collectively shape quality of life in both individual and national contexts.

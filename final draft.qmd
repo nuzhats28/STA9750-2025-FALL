@@ -1,0 +1,113 @@
+---
+title: "final draft"
+format: html
+---
+
+```{r}
+library(ggplot2)
+library(dplyr)
+
+income_data <- data.frame(
+  Category = c("Median Household Income", 
+               "Emotional Well Being", 
+               "Income Satiation for Life Evaluation"),
+  Amount = c(68703, 70000, 105000)
+)
+
+ggplot(income_data, aes(x = Amount, y = reorder(Category, Amount))) +
+  geom_col(fill = "#4B9CD3") +
+  geom_text(aes(label = paste0("$", format(Amount, big.mark=","))),
+            hjust = -0.1, size = 5) +
+  scale_x_continuous(labels = scales::dollar_format(),
+                     expand = expansion(mult = c(0, 0.15))) +
+  labs(
+    title = "US Household Income & Happiness Levels",
+    x = "Annual Income",
+    y = ""
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(plot.title = element_text(hjust = 0.5))
+
+```
+
+```{r}
+library(ggplot2)
+library(dplyr)
+
+set.seed(123)   # for reproducibility
+
+# Generate realistic income values (skewed toward lower incomes)
+income <- sort(rlnorm(200, meanlog = 10.5, sdlog = 0.35))  
+income <- pmin(income, 150000)  # cap at 150k
+
+# True diminishing returns curve
+true_happiness <- 1 - exp(-income / 25000)
+
+# Add realistic noise (survey variation)
+happiness <- true_happiness + rnorm(200, mean = 0, sd = 0.05)
+happiness <- pmin(pmax(happiness, 0), 1)  # keep between 0 and 1
+
+data <- data.frame(
+  Income = income,
+  Happiness = happiness
+)
+
+ggplot(data, aes(x = Income, y = Happiness)) +
+  geom_point(alpha = 0.6, size = 2.3) +    # scatter points
+  geom_smooth(se = FALSE, linewidth = 1.2, color = "blue") +  # trend line
+  scale_x_continuous(labels = scales::dollar_format()) +
+  labs(
+    title = "Income vs. Happiness",
+    subtitle = "Strong happiness gains at low incomes, diminishing returns after ~$60k",
+    x = "Income",
+    y = "Happiness (0–1 scale)"
+  ) +
+  theme_minimal(base_size = 15) +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    plot.subtitle = element_text(hjust = 0.5)
+  )
+
+```
+
+```{r}
+# Load libraries
+library(ggplot2)
+library(dplyr)
+library(scales)
+
+# Download the dataset directly from GitHub
+h <- read.csv("https://raw.githubusercontent.com/kirenz/datasets/master/happy.csv")
+
+# Check the first few rows
+head(h)
+
+# Create an income group for coloring
+h <- h %>%
+  mutate(IncomeGroup = case_when(
+    `Economy..GDP.per.Capita.` < 0.5 ~ "Low",
+    `Economy..GDP.per.Capita.` < 1.5 ~ "Medium",
+    TRUE ~ "High"
+  ))
+
+# Enhanced scatter plot
+ggplot(h, aes(x = `Economy..GDP.per.Capita.`, y = `Happiness.Score`, 
+              color = IncomeGroup, label = Country)) +
+  geom_point(size = 4, alpha = 0.8) +
+  geom_smooth(method = "lm", color = "black", linetype = "dashed", se = FALSE) +
+  geom_text(vjust = -0.8, size = 3) +
+  scale_x_log10(name = "GDP per Capita (log scale)") +
+  scale_y_continuous(name = "Happiness Score (0–10)") +
+  scale_color_manual(values = c("Low" = "#fc8d59", "Medium" = "#fee08b", "High" = "#91bfdb")) +
+  labs(title = "Happiness vs GDP per Capita Across Countries",
+       color = "Income Group") +
+  theme_minimal(base_size = 14) +
+  theme(
+    legend.position = "top",
+    plot.title = element_text(face = "bold", size = 16),
+    axis.title = element_text(face = "bold", size = 14)
+  )
+
+```
+
+

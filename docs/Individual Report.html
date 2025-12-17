@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.24">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Nuzhat Shahriyar">
+
+<title>Does making more money make people happier? – STA 9750 Submission Material</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dc55a5b9e770e841cd82e46aadbfb9b0.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-339e78669bd22224b7cb5e9437fe940b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-fixed fullcontent quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="./index.html" class="navbar-brand navbar-brand-logo">
+    </a>
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">STA 9750 Submission Material</span>
+    </a>
+  </div>
+        <div class="quarto-navbar-tools tools-end">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Does making more money make people happier?</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Nuzhat Shahriyar </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>Happiness has increasingly been recognized as a critical measure of societal progress, complementing traditional economic indicators such as GDP. While GDP captures material wealth, it does not fully account for the quality of life or well-being experienced by individuals. Across countries and cultures, significant variation exists in reported happiness, even among nations with comparable economic resources. This discrepancy raises an essential question: what drives human happiness, and to what extent is it tied to income?</p>
+<p>Income is often assumed to be a primary determinant of happiness. Higher income can alleviate financial stress, improve access to education, healthcare, and leisure, and provide greater opportunities for self-fulfillment. However, the relationship between income and happiness is complex and non-linear. Beyond a certain threshold, additional income contributes progressively less to happiness—a phenomenon known as <strong>diminishing marginal utility</strong>. Understanding these nuances is crucial for policymakers, economists, and social scientists, as it informs strategies for improving societal well-being.</p>
+<p>One of the foundational studies in happiness economics, conducted by Richard Easterlin in the 1970s, observed that within countries, higher income was associated with higher reported happiness. However, across countries, average income did not consistently predict national happiness, a phenomenon now known as the <strong>Easterlin Paradox</strong>. Subsequent research has refined these observations, indicating that income has a stronger effect on happiness at lower income levels, while other factors, such as social support, governance, and cultural norms, play a more substantial role at higher income levels. This paradox underscores the importance of examining both individual-level and country-level data to capture the full scope of the income–happiness relationship.</p>
+<p>Happiness itself is multidimensional. Scholars distinguish between <strong>emotional well-being</strong>, which reflects day-to-day feelings such as joy, stress, and satisfaction, and <strong>life satisfaction</strong>, representing a reflective assessment of overall life quality. Emotional well-being tends to plateau at moderate income levels, whereas life satisfaction may continue to rise with additional financial resources. Disentangling these dimensions is crucial for evaluating the broader impact of income and designing policies that target the aspects of happiness that matter most to individuals.</p>
+<p>This report addresses the specific question:</p>
+<p><strong>Does making more money make people happier, and if so, to what extent?</strong></p>
+<p>By examining both individual-level and country-level data, this report contributes to the overarching project question: <em>Which countries are the happiest in the world and why?</em> The analysis investigates patterns, thresholds, and exceptions in the income–happiness relationship, highlighting insights that emerge when combining multiple datasets. Ultimately, this study seeks to quantify the relationship between income and happiness while accounting for the multidimensional nature of well-being.</p>
+</section>
+<section id="data-sources-and-methodology" class="level1">
+<h1>Data Sources and Methodology</h1>
+<p>The primary data source for this analysis is the <strong>World Happiness Report</strong>, a publicly available dataset providing annual happiness scores for countries worldwide. This dataset is derived from survey responses in which individuals rate their lives on a 0–10 scale. In addition to the overall happiness score, the dataset includes explanatory variables such as GDP per capita, social support, freedom, generosity, health, and perceptions of corruption. GDP per capita serves as a proxy for national income, facilitating cross-country comparisons.</p>
+<p>The World Happiness Report surveys thousands of individuals in each participating country using stratified sampling methods to ensure representativeness. Respondents provide ratings of their current life satisfaction, along with responses to questions on social, economic, and institutional factors. This multi-dimensional approach allows researchers to identify both direct and indirect contributions of income to happiness. Importantly, survey-based measures capture <strong>subjective well-being</strong>, which may differ from purely objective indicators of quality of life.</p>
+<p>To complement country-level data, simulated individual-level income and happiness data were generated. Individual-level data allow for a detailed exploration of non-linear effects, thresholds, and diminishing returns that may not be visible in aggregate country-level data. Income values were generated using a log-normal distribution, reflecting the skewed nature of real-world income distributions, and capped at $150,000 to prevent distortion from extreme outliers. Random noise was incorporated to replicate variability found in survey responses, ensuring realistic patterns while maintaining reproducibility.</p>
+<hr>
+<section id="data-cleaning-and-preparation" class="level2">
+<h2 class="anchored" data-anchor-id="data-cleaning-and-preparation">Data Cleaning and Preparation</h2>
+<p>Several preprocessing steps were undertaken:</p>
+<ul>
+<li><strong>Country-level data</strong>: Only countries with complete GDP per capita and happiness score data were included, resulting in 157 countries. Missing or incomplete entries were excluded to avoid introducing bias.</li>
+<li><strong>Variable scaling</strong>: GDP per capita values were log-transformed for visualization, which better represents the wide range of incomes among countries, especially at lower income levels.</li>
+<li><strong>Categorization</strong>: Countries were grouped into low, medium, and high-income categories based on GDP per capita relative to global medians to enhance interpretability.</li>
+<li><strong>Individual-level data</strong>: Simulated income was combined with a non-linear happiness function to reflect diminishing returns, allowing exploration of patterns not apparent in country-level analysis.</li>
+<li><strong>Exploratory data analysis (EDA)</strong>: Visualizations of distributions, correlations, and outliers were performed to confirm expected patterns and ensure suitability for regression and plotting.</li>
+</ul>
+<p>The analysis utilizes scatter plots, bar charts, and trend lines generated using the <code>ggplot2</code> and <code>dplyr</code> packages in R. Visualizations illustrate non-linear effects, thresholds, and heterogeneity across countries and individuals. Logarithmic scaling, color-coding, and annotations highlight important features such as diminishing returns and exceptions to general patterns.</p>
+</section>
+</section>
+<section id="income-thresholds-and-dimensions-of-happiness" class="level1">
+<h1>Income Thresholds and Dimensions of Happiness</h1>
+<p>Income influences emotional well-being and life satisfaction differently. Emotional well-being improves rapidly at low-income levels but plateaus once basic needs are met. Life satisfaction continues to rise with income, reflecting broader life evaluations. Understanding these thresholds is critical for policy: modest income increases can have substantial effects on daily happiness, while higher incomes may primarily affect reflective life evaluations.</p>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'dplyr'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:stats':
+
+    filter, lag</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Individual-Report_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Figure 1:</strong> The comparison of median U.S. household income with estimated income thresholds for emotional well-being and life satisfaction reveals important insights into how income shapes different dimensions of happiness. As shown in Figure 1, emotional well-being increases sharply with income up to approximately $70,000 per year, suggesting that attaining basic financial security and the ability to meet essential needs has a substantial impact on daily mood, stress levels, and general life satisfaction. Beyond this threshold, additional income has a relatively small effect on emotional well-being, indicating that once basic needs and moderate comforts are met, other factors such as personal relationships, health, community engagement, and work–life balance play a more significant role in influencing day-to-day happiness. In contrast, overall life satisfaction—which reflects a broader, long-term evaluation of one’s life circumstances—continues to rise until roughly $105,000 per year. This distinction underscores that income affects different aspects of well-being in unique ways: while lower-income households experience large gains in immediate emotional well-being from even modest income increases, higher-income households may require additional non-monetary supports to improve their broader life satisfaction. These findings carry meaningful implications for policy and social planning. Programs that enhance income or provide targeted financial support for low- and middle-income families can yield significant improvements in everyday happiness, whereas efforts to boost overall life satisfaction among higher-income populations may benefit from complementary interventions such as promoting health and wellness, supporting social connections, encouraging work–life balance, and fostering community and civic engagement. Recognizing the multi-dimensional effects of income allows policymakers and organizations to better tailor strategies that maximize both emotional well-being and life satisfaction across diverse income levels, ensuring that resources are used effectively to enhance overall societal happiness.</p>
+</section>
+<section id="individual-level-diminishing-returns" class="level1">
+<h1>Individual-Level Diminishing Returns</h1>
+<p>At the individual level, the effect of income on happiness exhibits a clear pattern of diminishing returns. To explore this, a simulation generated income values with realistic skew and applied a non-linear happiness function. Random noise was added to reflect survey variability.</p>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>`geom_smooth()` using method = 'loess' and formula = 'y ~ x'</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Individual-Report_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Figure 2.</strong> The relationship between income and individual happiness exhibits a clear pattern of diminishing returns. The figure illustrates that at lower income levels, even modest increases in earnings can produce substantial improvements in emotional well-being and life satisfaction, as individuals gain access to basic needs, financial security, and opportunities for personal growth. However, this effect begins to taper off once income reaches approximately $50,000–$60,000 per year, after which additional income contributes progressively smaller gains in happiness. This non-linear relationship suggests that while financial resources are important for improving quality of life, they cannot fully compensate for other factors that influence well-being, such as social support, health, work–life balance, and cultural values. In practical terms, policies and interventions aimed at boosting happiness should prioritize supporting low- and middle-income populations, where incremental financial improvements have the largest impact, while also addressing non-economic factors that sustain long-term satisfaction and life fulfillment. Moreover, the figure highlights the importance of contextualizing income within broader social and psychological frameworks, demonstrating that wealth alone is not a guaranteed pathway to happiness and that a holistic approach is necessary to understand and enhance individual well-being.</p>
+</section>
+<section id="cross-country-analysis-of-income-and-happiness" class="level1">
+<h1>Cross-Country Analysis of Income and Happiness</h1>
+<p>To examine the relationship between income and happiness at the country level, GDP per capita was compared to national happiness scores from the World Happiness Report. Countries were categorized into low, medium, and high-income groups, and a log scale was applied to GDP to better visualize the wide range of incomes.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>  X     Country Happiness.Score Economy..GDP.per.Capita.  Family
+1 1     Denmark           7.526                  1.44178 1.16374
+2 2 Switzerland           7.509                  1.52733 1.14524
+3 3     Iceland           7.501                  1.42666 1.18326
+4 4      Norway           7.498                  1.57744 1.12690
+5 5     Finland           7.413                  1.40598 1.13464
+6 6      Canada           7.404                  1.44015 1.09610
+  Health..Life.Expectancy. Trust..Government.Corruption.
+1                  0.79504                       0.44453
+2                  0.86303                       0.41203
+3                  0.86733                       0.14975
+4                  0.79579                       0.35776
+5                  0.81091                       0.41004
+6                  0.82760                       0.31329</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in scale_x_log10(name = "GDP per Capita (log scale)"): log-10 transformation introduced infinite values.
+log-10 transformation introduced infinite values.
+log-10 transformation introduced infinite values.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 1 row containing non-finite outside the scale range
+(`stat_smooth()`).</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: The following aesthetics were dropped during statistical transformation: label.
+ℹ This can happen when ggplot fails to infer the correct grouping structure in
+  the data.
+ℹ Did you forget to specify a `group` aesthetic or to convert a numerical
+  variable into a factor?</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Individual-Report_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Figure 3:</strong> shows a scatter plot of GDP per capita versus happiness scores for countries around the world, with points color-coded by income group and a dashed trend line illustrating the overall relationship. The plot reveals a clear positive correlation, indicating that wealthier countries generally report higher happiness scores. However, the trend line flattens at higher GDP levels, demonstrating diminishing returns, where additional income contributes less to happiness in wealthier nations. Notable exceptions exist: some lower-income countries, such as Costa Rica and Bhutan, achieve high happiness due to strong social support and governance, while some high-income countries report lower-than-expected happiness, highlighting the role of cultural, institutional, and social factors. These patterns suggest that income alone does not fully determine happiness and that social networks, trust in government, effective institutions, and work–life balance are also critical. Overall, Figure 3 emphasizes that improving national well-being requires a multi-dimensional approach that goes beyond economic growth to include social, cultural, and institutional considerations.</p>
+</section>
+<section id="integration-with-broader-happiness-factors" class="level1">
+<h1>Integration With Broader Happiness Factors</h1>
+<p>Income alone does not explain why some countries are happier. By combining this analysis with other project components—such as corruption perception and vacation days—a clearer picture emerges:</p>
+<ul>
+<li><strong>Social and institutional quality:</strong> Countries with similar income levels may differ in happiness due to governance, trust in institutions, and public services.<br>
+</li>
+<li><strong>Work–life balance:</strong> Vacation days and leisure time affect life satisfaction independently of income.<br>
+</li>
+<li><strong>Cultural norms:</strong> Attitudes toward money, consumption, and social cohesion mediate the income–happiness relationship.</li>
+</ul>
+<p>This integrated view allows identification of patterns that individual analyses would miss, reinforcing that the happiest countries combine economic resources with supportive social and institutional frameworks.</p>
+</section>
+<section id="limitations-and-moving-beyond-correlation" class="level1">
+<h1>Limitations and Moving Beyond Correlation</h1>
+<p>Several limitations must be acknowledged:</p>
+<ol type="1">
+<li><strong>Causality:</strong> Correlation does not imply causation. Higher income may lead to greater happiness, but happier individuals may also pursue higher-paying opportunities.<br>
+</li>
+<li><strong>Data quality:</strong> World Happiness Report surveys may contain self-report bias, cultural differences, or sampling limitations.<br>
+</li>
+<li><strong>Unobserved variables:</strong> Factors such as health, family structure, and climate can confound income–happiness relationships.<br>
+</li>
+<li><strong>Temporal limitations:</strong> GDP per capita and happiness are often measured annually, but long-term trends or shocks may be missed.</li>
+</ol>
+<p>Future analyses could incorporate regression modeling, bootstrapping, or multi-variable causal inference techniques to move beyond correlation. Including panel data or longitudinal surveys would allow stronger causal claims about how income changes affect happiness over time.</p>
+</section>
+<section id="conclusion" class="level1">
+<h1>Conclusion</h1>
+<p>This report shows that income is a significant determinant of happiness, but its effect exhibits clear <strong>diminishing returns</strong> beyond moderate income levels. At the individual level, emotional well-being rises sharply with increases in income among low- and middle-income earners, reflecting the critical role of financial resources in securing basic needs, reducing stress, and providing access to goods, services, and opportunities that directly enhance day-to-day life satisfaction. However, once a household reaches moderate income levels, additional financial gains contribute progressively smaller improvements to emotional well-being, suggesting that factors beyond income—such as social relationships, physical and mental health, work–life balance, and personal fulfillment—become increasingly important determinants of happiness. Life satisfaction, which represents a broader, long-term evaluation of one’s circumstances, continues to benefit from higher income, though at a slower rate, indicating that wealth can still enhance opportunities, personal development, and perceived life stability even after immediate needs are met.</p>
+<p>At the national level, GDP per capita explains part of the variation in happiness across countries, but the presence of notable exceptions underscores the critical importance of social, institutional, and cultural factors. Countries that successfully translate economic resources into well-being do so by coupling financial stability with strong social support networks, effective and transparent institutions, low levels of corruption, and policies that promote a balanced lifestyle and healthy work–life integration. Conversely, countries with high GDP per capita but weaker social institutions or lower levels of trust in governance often fail to achieve the happiness levels predicted by their economic wealth alone. This demonstrates that economic prosperity is necessary but not sufficient for fostering collective well-being, and that the broader social and institutional context plays a decisive role in shaping happiness outcomes.</p>
+<p>These findings highlight the limitations of policies that focus exclusively on increasing economic growth. While financial development is important, maximizing societal happiness requires complementary strategies that strengthen institutional quality, enhance social safety nets, promote public health and education, and support balanced lifestyles. Interventions that address these non-economic dimensions of well-being can amplify the positive effects of income and help ensure that gains in wealth translate into sustainable improvements in happiness. In summary, while income is undeniably important, <strong>money alone does not guarantee happiness</strong>; lasting well-being emerges from the interaction of financial resources with social, cultural, and institutional supports that collectively shape quality of life across both individual and national contexts.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/github\.com\/nuzhats28\/STA9750-2025-FALL\.git");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

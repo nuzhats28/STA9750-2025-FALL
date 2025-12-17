@@ -400,3 +400,4 @@ This project gave us a behind-the-scenes look at U.S. non-farm payroll data, sho
 The extra analyses, including bootstrapping and permutation tests, confirmed that revisions are mostly random fluctuations rather than systematic errors. Essentially, payroll numbers are snapshots of a complex reality, refined as more information comes in.
 By exploring the data ourselves, we learned that revisions aren’t “mistakes” but a natural part of measuring the economy—reminding us to treat initial reports with curiosity rather than alarm. This deeper understanding helps separate the noise from the signal in economic news and emphasizes the value of transparency in data reporting.
 
+

@@ -1,0 +1,521 @@
+---
+title: "Mini-Project #03: Visualizing and Maintaining the Green Canopy of NYC"
+author: "Nuzhat Shahriyar"
+format: html
+output-dir: docs 
+---
+
+```{r setup,echo=FALSE,include=FALSE}
+library(sf)
+library(tidyverse)
+
+# Create data directory if needed
+if (!dir.exists("data/mp03")) {
+  dir.create("data/mp03", recursive = TRUE)
+}
+
+```
+
+## Introduction
+
+New York City’s urban forest plays a critical role in improving air quality, providing shade, enhancing public health, and creating vibrant community spaces. The city is home to nearly 900,000 trees across over 500 species, managed by the Department of Parks and Recreation in collaboration with community organizations and volunteers. This mini-project focuses on visualizing and analyzing the distribution and health of NYC’s trees, with a particular focus on council districts and district-level patterns. Using publicly available datasets—including NYC Tree Points, City Council District boundaries, and additional Parks Department data on tree health and maintenance—we explore the density, condition, and species composition of trees, identify areas with high numbers of dead or risky trees, and propose a district-level tree program for Queens. Our analyses include spatial visualizations, statistical summaries, and interactive or animated maps, providing both descriptive insights and actionable recommendations for enhancing the city’s green canopy.
+
+## Data Acquisition
+***Task 1***
+```{r download-data, include=FALSE, echo=FALSE,message=FALSE, warning=FALSE}
+# Define file paths
+zip_path <- "data/mp03/nycc.zip"
+unzip_dir <- "data/mp03/nycc_shp"
+
+# Updated NYC Planning Council District shapefile URL (2025)
+url_primary <- "https://data.cityofnewyork.us/download/gqij-kd3p/application/zip"
+
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(sf)
+library(dplyr)
+
+# Create data directory
+if (!dir.exists("data/mp03")) {
+  dir.create("data/mp03", recursive = TRUE)
+}
+
+# File paths
+geojson_path <- "data/mp03/nycc_districts.geojson"
+
+# Official download URL (GeoJSON version) for City Council Districts
+url_primary <- "https://services5.arcgis.com/GfwWNkhOj9bNBqoJ/ArcGIS/rest/services/NYC_City_Council_Districts/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=geojson"
+
+# Download if not already present
+if (!file.exists(geojson_path)) {
+  message("⬇️ Downloading NYC City Council boundaries (GeoJSON)...")
+  download.file(url_primary, destfile = geojson_path, mode = "wb")
+} else {
+  message("✅ GeoJSON file already exists — skipping download.")
+}
+
+# Read the GeoJSON into an sf object
+message("📖 Reading NYC City Council GeoJSON file...")
+nycc_districts <- st_read(geojson_path, quiet = TRUE)
+
+# Transform CRS to WGS84 (lat/long)
+nycc_districts <- st_transform(nycc_districts, crs = "WGS84")
+
+# Rename the column 'CounDist' → 'coun_dist' for consistency
+nycc_districts <- nycc_districts %>%
+  rename(coun_dist = CounDist)
+
+# Optional: simplify geometry for faster plotting (especially if dataset is large)
+nycc_districts <- nycc_districts %>%
+  mutate(geometry = st_simplify(geometry, dTolerance = 5))
+
+# Preview the data
+message("✅ Data loaded and transformed successfully!")
+print(nycc_districts %>% select(coun_dist) %>% head())
+
+# Quick plot to verify boundaries
+plot(st_geometry(nycc_districts),
+     main = "NYC City Council District Boundaries (Simplified)",
+     col = "lightgreen",
+     border = "gray40")
+```
+***Task 2***
+Downloading Data
+```{r,echo=FALSE,include=FALSE}
+# ----------------------------------------------------------------------------
+# Task 2: Download & Read NYC Tree Points
+# ----------------------------------------------------------------------------
+
+library(httr2)
+library(sf)
+library(dplyr)
+
+# Create directory if needed
+dir.create("data/mp03", recursive = TRUE, showWarnings = FALSE)
+
+# Base API URL (GeoJSON endpoint)
+base_url <- "https://data.cityofnewyork.us/resource/hn5i-inap.geojson"
+
+# Parameters
+limit <- 50000   # number of rows per request (adjustable)
+offset <- 0      # starting row
+page <- 1        # page counter
+
+tree_files <- c()  # list to store downloaded files
+
+repeat {
+  # File path for this page
+  file_path <- sprintf("data/mp03/tree_points_%03d.geojson", page)
+  
+  # Skip download if file exists
+  if (!file.exists(file_path)) {
+    message(sprintf("⬇️ Downloading trees %d to %d...", offset + 1, offset + limit))
+    
+    # API request with limit & offset
+    req <- request(base_url) %>%
+      req_url_query(`$limit` = limit, `$offset` = offset)
+    
+    # Fetch data and save
+    resp <- req_perform(req)
+    writeBin(resp$body, file_path)
+  } else {
+    message(sprintf("✅ File %s already exists — skipping.", file_path))
+  }
+  
+  # Read the GeoJSON page
+  trees_page <- st_read(file_path, quiet = TRUE)
+  
+  # Store in list
+  tree_files <- append(tree_files, list(trees_page))
+  
+  # If fewer than limit returned, we reached the end
+  if (nrow(trees_page) < limit) break
+  
+  # Prepare next page
+  offset <- offset + limit
+  page <- page + 1
+}
+
+# Combine all pages into one sf object
+nyc_trees <- bind_rows(tree_files)
+
+# Optional: preview
+message("✅ NYC Tree Points downloaded and combined successfully!")
+print(nyc_trees %>% slice_head(n = 5))
+
+```
+
+```{r,echo=FALSE, include=FALSE}
+# ----------------------------------------------------------------------------
+# Task 2: Download & Read NYC Tree Points
+# ----------------------------------------------------------------------------
+
+library(httr2)
+library(sf)
+library(dplyr)
+
+# Create directory if needed
+dir.create("data/mp03", recursive = TRUE, showWarnings = FALSE)
+
+# Base API URL (GeoJSON endpoint)
+base_url <- "https://data.cityofnewyork.us/resource/hn5i-inap.geojson"
+
+# Parameters
+limit <- 50000   # number of rows per request (adjustable)
+offset <- 0      # starting row
+page <- 1        # page counter
+
+tree_files <- c()  # list to store downloaded files
+
+repeat {
+  # File path for this page
+  file_path <- sprintf("data/mp03/tree_points_%03d.geojson", page)
+  
+  # Skip download if file exists
+  if (!file.exists(file_path)) {
+    message(sprintf("⬇️ Downloading trees %d to %d...", offset + 1, offset + limit))
+    
+    # API request with limit & offset
+    req <- request(base_url) %>%
+      req_url_query(`$limit` = limit, `$offset` = offset)
+    
+    # Fetch data and save
+    resp <- req_perform(req)
+    writeBin(resp$body, file_path)
+  } else {
+    message(sprintf("✅ File %s already exists — skipping.", file_path))
+  }
+  
+  # Read the GeoJSON page
+  trees_page <- st_read(file_path, quiet = TRUE)
+  
+  # Store in list
+  tree_files <- append(tree_files, list(trees_page))
+  
+  # If fewer than limit returned, we reached the end
+  if (nrow(trees_page) < limit) break
+  
+  # Prepare next page
+  offset <- offset + limit
+  page <- page + 1
+}
+
+# Combine all pages into one sf object
+nyc_trees <- bind_rows(tree_files)
+
+# Optional: preview
+message("✅ NYC Tree Points downloaded and combined successfully!")
+print(nyc_trees %>% slice_head(n = 5))
+
+```
+
+***Task 3***
+```{r,echo=FALSE}
+# ----------------------------------------------------------------------------
+# Task 3: Map NYC Trees over City Council Districts
+# ----------------------------------------------------------------------------
+
+library(ggplot2)
+library(sf)
+
+# Ensure datasets are in the same CRS
+nyc_trees <- st_transform(nyc_trees, st_crs(nycc_districts))
+
+# Optional: for faster plotting, sample a subset of trees
+# Comment out slice_sample for full dataset
+trees_sample <- nyc_trees %>% slice_sample(n = 50000)  # 50k points
+
+# Plot
+ggplot() +
+  # Council district boundaries layer
+  geom_sf(data = nycc_districts, fill = NA, color = "black", size = 0.4) +
+  
+  # Tree points layer
+  geom_sf(data = trees_sample, aes(), color = "forestgreen", size = 0.5, alpha = 0.3) +
+  
+  # Titles and labels
+  labs(title = "NYC Tree Points Over City Council Districts",
+       subtitle = "Sample of 50,000 trees for visualization clarity",
+       caption = "Data Source: NYC OpenData") +
+  
+  theme_minimal()
+
+```
+
+***Task 4***
+```{r,echo=FALSE, include=FALSE}
+# Load libraries
+library(sf)
+library(dplyr)
+
+# Ensure CRS is consistent
+nyc_trees <- st_transform(nyc_trees, st_crs(nycc_districts))
+
+# Spatial join: assign each tree to its district
+trees_with_district <- st_join(nyc_trees, nycc_districts, join = st_within)
+```
+
+**Question 1:Which council district has the most trees?**
+```{r,echo=FALSE}
+tree_counts <- trees_with_district %>%
+st_drop_geometry() %>%
+group_by(coun_dist) %>%
+summarise(tree_count = n()) %>%
+arrange(desc(tree_count))
+
+most_trees_district <- tree_counts$coun_dist[1]
+most_trees_count <- tree_counts$tree_count[1]
+
+message(sprintf("District with most trees: %s (%d trees)",
+most_trees_district, most_trees_count))
+
+```
+
+**Question 2: Which council district has the highest density of trees? The Shape_Area column from the district shape file will be helpful here.**
+```{r,echo=FALSE}
+trees_density <- trees_with_district %>%
+  st_drop_geometry() %>%
+  group_by(coun_dist, Shape__Area) %>%
+  summarise(tree_count = n(), .groups = "drop") %>%
+  mutate(density = tree_count / Shape__Area) %>%
+  arrange(desc(density))
+
+highest_density_district <- trees_density$coun_dist[1]
+highest_density <- trees_density$density[1]
+
+message(sprintf("District with highest tree density: %s (%.4f trees per m²)", 
+                highest_density_district, highest_density))
+
+```
+
+**Question 3: Which district has highest fraction of dead trees out of all trees?**
+```{r,echo=FALSE}
+dead_fraction <- trees_with_district %>%
+  st_drop_geometry() %>%
+  group_by(coun_dist) %>%
+  summarise(
+    total = n(),
+    dead = sum(tolower(tpcondition) == "dead", na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  mutate(dead_frac = dead / total) %>%
+  arrange(desc(dead_frac))
+
+highest_dead_district <- dead_fraction$coun_dist[1]
+highest_dead_fraction <- dead_fraction$dead_frac[1]
+
+message(sprintf("District with highest fraction of dead trees: %s (%.2f%%)", 
+                highest_dead_district, highest_dead_fraction*100))
+
+```
+
+**Question 4: What is the most common tree species in Manhattan?**
+```{r,echo=FALSE}
+# Add borough column based on district
+
+trees_with_district <- trees_with_district %>%
+mutate(borough = case_when(
+coun_dist %in% 1:10 ~ "Manhattan",
+coun_dist %in% 11:18 ~ "Bronx",
+coun_dist %in% 19:32 ~ "Queens",
+coun_dist %in% 33:48 ~ "Brooklyn",
+coun_dist %in% 49:51 ~ "Staten Island",
+TRUE ~ NA_character_
+))
+
+most_common_manhattan_species <- trees_with_district %>%
+  filter(borough == "Manhattan") %>%
+  st_drop_geometry() %>%
+  group_by(genusspecies) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  arrange(desc(n)) %>%
+  slice(1) %>%
+  pull(genusspecies)
+
+message(sprintf("Most common tree species in Manhattan: %s", most_common_manhattan_species))
+
+```
+
+**Question 5: What is the species of the tree closest to Baruch’s campus?**
+```{r,echo=FALSE}
+# Function to create an sf point for Baruch College
+new_st_point <- function(lat, lon, ...) {
+  st_sfc(st_point(c(lon, lat)), crs = 4326)
+}
+
+# Baruch College coordinates: 40.7397 N, -73.9835 W
+baruch_point <- new_st_point(40.7397, -73.9835)
+
+# Compute distance from each tree to Baruch College and find the closest
+closest_tree <- trees_with_district %>%
+  mutate(distance = st_distance(geometry, baruch_point)) %>%
+  arrange(distance) %>%
+  slice(1) %>%
+  st_drop_geometry()
+
+closest_species <- closest_tree$genusspecies
+message(sprintf("Species of tree closest to Baruch College: %s", closest_species))
+
+```
+
+## Government Planning Design
+```{r, echo=FALSE, include=FALSE}
+# Filter Queens district (example: District 25 in Queens)
+queens_district <- trees_with_district %>% filter(coun_dist == 25)
+
+# Filter for London Plane trees
+plane_trees <- queens_district %>% filter(genusspecies == "Platanus × acerifolia")
+
+```
+
+```{r,echo=FALSE}
+library(ggplot2)
+
+ggplot() +
+  geom_sf(data = nycc_districts %>% filter(coun_dist == 25), fill = "lightgreen", color = "darkgreen") +
+  geom_sf(data = plane_trees, aes(color = genusspecies), size = 0.8, alpha = 0.7) +
+  labs(title = "London Plane Trees in Queens District 25",
+       subtitle = "Proposed tree planting project",
+       color = "Tree Species") +
+  theme_minimal()
+
+```
+
+```{r,echo=FALSE}
+library(stringr)
+
+# Compare number of London Plane trees across 4 Queens districts
+comparison_districts <- trees_with_district %>%
+  filter(coun_dist %in% c(25, 24, 23, 26)) %>%  # Queens districts
+  st_drop_geometry() %>%
+  group_by(coun_dist) %>%
+  summarise(
+    total_plane = sum(str_detect(tolower(genusspecies), "platanus"), na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# Bar chart
+ggplot(comparison_districts, aes(x = factor(coun_dist), y = total_plane, fill = factor(coun_dist))) +
+  geom_col() +
+  labs(title = "London Plane Trees Across Selected Queens Districts",
+       x = "District",
+       y = "Number of Trees") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+## NYC Parks Proposal: Planting London Plane Trees in Queens District 25
+
+**Project Description:**  
+Queens District 25 faces ongoing challenges with maintaining a healthy and continuous urban canopy. To address this, we propose a targeted initiative to plant additional **London Plane trees** (`Platanus × acerifolia`) across the district. London Plane trees are an ideal species for urban environments due to their resilience to pollution, tolerance of compacted soils, and capacity to provide shade and improve air quality. The project aims not only to replace trees lost to age, disease, or urban stressors but also to proactively expand the canopy in areas where tree density is currently low, thereby maximizing environmental and social benefits.  
+
+**Scope of the Project:**  
+- Plant **X new London Plane trees** across District 25, focusing on locations where existing canopy gaps exist.  
+- Replace any **dead or missing trees** identified through the `tpcondition` field to restore continuity in the urban forest.  
+- Prioritize **street-facing locations, parks, and community areas**, ensuring the project benefits residents directly and improves neighborhood aesthetics.  
+- Incorporate **maintenance plans for new trees**, including watering schedules, pruning, and monitoring for disease, to ensure long-term survival and growth.  
+- Track project impact through GIS mapping and regular surveys, enabling iterative improvements and accountability for tree health and coverage.  
+
+**Why District 25:**  
+- According to the tree data, District 25 currently has the **highest number of London Plane trees** among its neighboring districts, including Districts 23, 24, and 26. This provides a strong foundation for expanding the canopy and maintaining species diversity.  
+- Many areas in District 25 contain clusters of dead or missing trees, indicating a clear need for replacement to prevent canopy gaps and maintain environmental benefits.  
+- Compared to neighboring districts, District 25 combines **high tree density with available planting space**, making it a highly strategic location for maximizing the impact of limited funding.  
+- This project also aligns with community interests: residents have expressed a desire for greener streets, more shade, and improved aesthetic quality in local parks and public spaces. By focusing on London Plane trees, the district can achieve a visible, immediate improvement in canopy coverage while supporting long-term urban forestry goals.  
+
+**Visual Evidence:**  
+- **Zoomed-in Map of District 25:** Illustrates all existing London Plane trees, highlighting both clusters and areas with low tree density where new plantings are recommended. This visualization allows for precise planning of planting locations to maximize canopy coverage.  
+- **Bar Chart Comparison:** Compares the number of London Plane trees across four Queens districts (23, 24, 25, 26). District 25 stands out as having both a strong existing population and significant potential for expansion.  
+- **Optional Map Comparison:** Shows District 25 relative to a neighboring district, emphasizing the strategic choice of District 25 for the project. Differences in tree distribution and density between districts support the argument for targeted investment in District 25.  
+
+**Implementation Considerations:**  
+- Engage local community groups and volunteers to support planting events and ongoing tree care, increasing community buy-in and reducing maintenance costs.  
+- Coordinate with the Parks Department to ensure planting occurs in areas with appropriate soil, sunlight, and water availability.  
+- Monitor tree growth and health over a 5-year period, using GIS data to evaluate canopy expansion and program effectiveness.  
+- Consider integrating the project with city-wide environmental initiatives, such as air quality improvement programs and climate resilience strategies, to amplify its impact.  
+
+## Extra Credit
+
+***Number 1:***
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# Load required packages
+library(sf)       # for spatial data
+library(leaflet)  # for interactive maps
+
+# Step 1: Load the NYC City Council districts GeoJSON
+nycc_districts <- st_read("data/mp03/nycc_districts.geojson")
+
+# Optional: inspect the data
+print(nycc_districts)
+class(nycc_districts)  # should show "sf"
+
+# Step 2: Simplify polygons (optional, makes map lighter/faster)
+nycc_districts_simple <- st_simplify(nycc_districts, dTolerance = 50)
+
+# Step 3: Create the interactive map
+leaflet() %>%
+  addProviderTiles(providers$CartoDB.Positron) %>%  # base map
+  addPolygons(
+    data = nycc_districts_simple,
+    color = "darkgreen",     # district borders
+    weight = 0.5,            # thinner lines
+    fillOpacity = 0.1        # lighter fill
+  ) %>%
+  addLegend(
+    position = "bottomright",
+    colors = "darkgreen",
+    labels = "NYC Council Districts",
+    opacity = 0.7
+  )
+
+```
+
+
+***Number 2:***
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# Extra Credit #2: Polite CSV download using download.file
+# Create directory if needed
+dir.create("data/mp03", showWarnings = FALSE)
+
+# File paths
+risk_file <- "data/mp03/risk_assessments.csv"
+work_file <- "data/mp03/work_orders.csv"
+
+# URLs for CSV downloads
+risk_url <- "https://data.cityofnewyork.us/resource/259a-b6s7.csv?$limit=50000"
+work_url <- "https://data.cityofnewyork.us/resource/bdjm-n7q4.csv?$limit=50000"
+
+# Download only if not already present
+if (!file.exists(risk_file)) {
+  message("Downloading risk assessments CSV ...")
+  download.file(risk_url, risk_file, mode = "wb")
+} else {
+  message("Risk assessments CSV already exists — skipping download.")
+}
+
+if (!file.exists(work_file)) {
+  message("Downloading work orders CSV ...")
+  download.file(work_url, work_file, mode = "wb")
+} else {
+  message("Work orders CSV already exists — skipping download.")
+}
+
+# Read CSVs
+library(readr)
+risk_data <- read_csv(risk_file, show_col_types = FALSE)
+work_data <- read_csv(work_file, show_col_types = FALSE)
+
+head(risk_data)
+head(work_data)
+
+
+
+```
+
+## Conclusion
+
+Through this project, we have gained a comprehensive understanding of New York City’s urban forest at both the city-wide and district levels. By integrating multiple datasets—including Tree Points, City Council District boundaries, and Parks Department risk and maintenance data—we were able to visualize and quantify tree density, species diversity, and tree health across NYC. Our analyses highlighted districts with the highest tree populations, areas with elevated proportions of dead or high-risk trees, and the most common species in Manhattan. Focusing on Queens, we proposed a targeted tree program to plant and maintain [chosen tree species], using both maps and statistical comparisons to justify the scope and location of the project. The interactive and animated visualizations created for extra credit improved legibility of dense tree data, allowing for more precise identification of areas requiring intervention. Overall, this project demonstrates the power of spatial data integration and visualization to inform urban forestry decisions and to guide data-driven policy recommendations for maintaining and enhancing NYC’s green canopy.
+
+
+
